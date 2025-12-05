@@ -1,0 +1,63 @@
+## Ignore build outputs
+bin/
+obj/
+out/
+publish/
+
+## Visual Studio files
+.vs/
+.vscode/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Logs
+*.log
+
+## Environment files
+*.env
+*.env.*
+appsettings.Development.json
+appsettings.Local.json
+
+## Entity Framework Core Migrations Backup
+*Migrations/*.Designer.cs
+*Migrations/*Snapshot.cs
+
+## ASP.NET Core generated files
+wwwroot/lib/
+wwwroot/node_modules/
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+## NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+## DotNet tools
+.dotnet
+tools/
+
+## ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+## Rider
+.idea/
+
+## OS generated
+.DS_Store
+Thumbs.db
+
+## Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.lock
