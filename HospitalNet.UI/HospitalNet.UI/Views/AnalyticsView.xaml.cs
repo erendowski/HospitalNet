@@ -18,6 +18,13 @@ namespace HospitalNet.UI.Views
         public AnalyticsView()
         {
             InitializeComponent();
+            if (App.OfflineMode)
+            {
+                PerformanceMetricsGrid.ItemsSource = null;
+                StatusTextBlock.Text = "Analytics offline (no database connection).";
+                return;
+            }
+
             InitializeManagers();
             SetDateRanges();
             LoadInitialMetrics();
@@ -27,6 +34,14 @@ namespace HospitalNet.UI.Views
         {
             try
             {
+                if (App.OfflineMode)
+                {
+                    _analyticsManager = null;
+                    _appointmentManager = null;
+                    StatusTextBlock.Text = "Analytics offline (no database connection).";
+                    return;
+                }
+
                 var dbHelper = new DatabaseHelper(App.ConnectionString);
                 if (!dbHelper.TestConnection())
                 {

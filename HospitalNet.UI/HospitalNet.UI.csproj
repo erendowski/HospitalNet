@@ -3,15 +3,14 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!-- Use local Backend copies; drop linked includes from parent Backend folder. -->
   <ItemGroup>
-    <Compile Include="..\Backend\BusinessLogic\**\*.cs" Link="Backend\BusinessLogic\%(RecursiveDir)%(Filename)%(Extension)" />
-    <Compile Include="..\Backend\Infrastructure\*.cs" Link="Backend\Infrastructure\%(Filename)%(Extension)" />
-    <Compile Include="..\Backend\Models\**\*.cs" Link="Backend\Models\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Remove="..\Backend\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

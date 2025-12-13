@@ -23,6 +23,13 @@ namespace HospitalNet.UI.Views
         public DoctorsView()
         {
             InitializeComponent();
+            if (App.OfflineMode)
+            {
+                AppointmentsGrid.ItemsSource = null;
+                StatusTextBlock.Text = "Doctors offline (no database connection).";
+                return;
+            }
+
             InitializeManagers();
             ScheduleDatePicker.SelectedDate = DateTime.Today;
             LoadAppointmentsForDate(DateTime.Today);
@@ -32,6 +39,15 @@ namespace HospitalNet.UI.Views
         {
             try
             {
+                if (App.OfflineMode)
+                {
+                    _doctorManager = null;
+                    _appointmentManager = null;
+                    _patientManager = null;
+                    StatusTextBlock.Text = "Doctors offline (no database connection).";
+                    return;
+                }
+
                 var dbHelper = new DatabaseHelper(App.ConnectionString);
                 if (!dbHelper.TestConnection())
                 {

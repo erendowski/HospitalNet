@@ -15,6 +15,16 @@ namespace HospitalNet.UI.Views
         public SettingsView()
         {
             InitializeComponent();
+            if (App.OfflineMode)
+            {
+                ConnectionStringTextBox.Text = TrimConnectionString(App.ConnectionString);
+                ConnectionStatusTextBlock.Text = "Status: Offline";
+                ConnectionStatusTextBlock.Foreground = (System.Windows.Media.Brush)FindResource("TextSecondaryBrush");
+                DatabaseVersionTextBlock.Text = "Offline";
+                StatusTextBlock.Text = "Settings offline (no database connection).";
+                return;
+            }
+
             LoadSettings();
         }
 
@@ -23,7 +33,7 @@ namespace HospitalNet.UI.Views
             try
             {
                 string connectionString = App.ConnectionString;
-                ConnectionStringTextBox.Text = connectionString.Length > 50 ? connectionString[..50] + "..." : connectionString;
+                ConnectionStringTextBox.Text = TrimConnectionString(connectionString);
 
                 TestConnection();
 
@@ -47,6 +57,14 @@ namespace HospitalNet.UI.Views
 
         private void TestConnectionButton_Click(object sender, RoutedEventArgs e)
         {
+            if (App.OfflineMode)
+            {
+                ConnectionStatusTextBlock.Text = "Status: Offline";
+                ConnectionStatusTextBlock.Foreground = (System.Windows.Media.Brush)FindResource("TextSecondaryBrush");
+                StatusTextBlock.Text = "Cannot test while offline.";
+                return;
+            }
+
             TestConnection();
         }
 
@@ -54,6 +72,14 @@ namespace HospitalNet.UI.Views
         {
             try
             {
+                if (App.OfflineMode)
+                {
+                    ConnectionStatusTextBlock.Text = "Status: Offline";
+                    ConnectionStatusTextBlock.Foreground = (System.Windows.Media.Brush)FindResource("TextSecondaryBrush");
+                    StatusTextBlock.Text = "Cannot test while offline.";
+                    return;
+                }
+
                 _databaseHelper = new DatabaseHelper(App.ConnectionString);
                 bool isConnected = _databaseHelper.TestConnection();
 
@@ -82,6 +108,11 @@ namespace HospitalNet.UI.Views
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        private string TrimConnectionString(string connectionString)
+        {
+            return connectionString.Length > 50 ? connectionString[..50] + "..." : connectionString;
         }
     }
 }

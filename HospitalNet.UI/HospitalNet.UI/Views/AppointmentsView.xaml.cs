@@ -22,6 +22,12 @@ namespace HospitalNet.UI.Views
         public AppointmentsView()
         {
             InitializeComponent();
+            if (App.OfflineMode)
+            {
+                AppointmentsDataGrid.ItemsSource = null;
+                return;
+            }
+
             InitializeManagers();
             LoadDoctors();
             LoadPatients();
@@ -32,6 +38,14 @@ namespace HospitalNet.UI.Views
         {
             try
             {
+                if (App.OfflineMode)
+                {
+                    _doctorManager = null;
+                    _patientManager = null;
+                    _appointmentManager = null;
+                    return;
+                }
+
                 var dbHelper = new DatabaseHelper(App.ConnectionString);
                 if (!dbHelper.TestConnection())
                 {
@@ -45,7 +59,7 @@ namespace HospitalNet.UI.Views
                 _patientManager = new PatientManager(App.ConnectionString);
                 _appointmentManager = new AppointmentManager(App.ConnectionString);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _doctorManager = null;
                 _patientManager = null;
@@ -70,7 +84,7 @@ namespace HospitalNet.UI.Views
                     DoctorComboBox.SelectedIndex = 0;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 DoctorComboBox.ItemsSource = null;
             }
@@ -93,7 +107,7 @@ namespace HospitalNet.UI.Views
                     PatientComboBox.SelectedIndex = 0;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 PatientComboBox.ItemsSource = null;
             }
@@ -152,7 +166,7 @@ namespace HospitalNet.UI.Views
 
                 AppointmentsDataGrid.ItemsSource = displayAppointments;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 AppointmentsDataGrid.ItemsSource = null;
             }

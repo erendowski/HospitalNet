@@ -22,13 +22,30 @@ namespace HospitalNet.UI.Views
         public PatientsView()
         {
             InitializeComponent();
+            if (App.OfflineMode)
+            {
+                PatientsDataGrid.ItemsSource = null;
+                StatusTextBlock.Text = "Patients offline (no database connection).";
+                CountTextBlock.Text = "Total: -";
+                return;
+            }
+
             LoadPatients();
         }
 
         private void LoadPatients()
         {
             try
-        {
+            {
+                if (App.OfflineMode)
+                {
+                    _patientManager = null;
+                    PatientsDataGrid.ItemsSource = null;
+                    StatusTextBlock.Text = "Patients offline (no database connection).";
+                    CountTextBlock.Text = "Total: -";
+                    return;
+                }
+
                 var dbHelper = new DatabaseHelper(App.ConnectionString);
                 if (!dbHelper.TestConnection())
                 {
