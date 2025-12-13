@@ -20,5 +20,18 @@ namespace HospitalNet.UI
         {
             InitializeComponent();
         }
+
+        private void NavigationButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string tag)
+            {
+                PageTitleTextBlock.Text = tag;
+            }
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
     }
 }
