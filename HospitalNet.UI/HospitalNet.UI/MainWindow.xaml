@@ -52,7 +52,7 @@
                                 BorderThickness="3,0,0,0"
                                 BorderBrush="Transparent">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="??" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE80F;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Dashboard" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
@@ -68,7 +68,7 @@
                                 BorderBrush="Transparent"
                                 Margin="0,4,0,0">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="??" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE77B;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Patients" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
@@ -84,7 +84,7 @@
                                 BorderBrush="Transparent"
                                 Margin="0,4,0,0">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="??" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE787;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Appointments" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
@@ -100,7 +100,7 @@
                                 BorderBrush="Transparent"
                                 Margin="0,4,0,0">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="??" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE95E;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Doctors" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
@@ -116,7 +116,7 @@
                                 BorderBrush="Transparent"
                                 Margin="0,4,0,0">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="??" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE9D2;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Analytics" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
@@ -133,7 +133,7 @@
                                 BorderThickness="3,0,0,0"
                                 BorderBrush="Transparent">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="S" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE713;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Settings" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
@@ -148,7 +148,7 @@
                                 BorderBrush="Transparent"
                                 Margin="0,4,0,0">
                             <StackPanel Orientation="Horizontal" Margin="16,0">
-                                <TextBlock Text="X" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <TextBlock Text="&#xE7E8;" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0" FontFamily="Segoe MDL2 Assets"/>
                                 <TextBlock Text="Exit" VerticalAlignment="Center" FontSize="14"/>
                             </StackPanel>
                         </Button>
