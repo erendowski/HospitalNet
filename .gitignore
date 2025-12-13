@@ -1,6 +1,7 @@
-﻿HospitalNet.UI/obj
-HospitalNet.UI/.vs
-HospitalNet.Data/obj
-HospitalNet.Core/obj
-.vs
-HospitalNet.UI/bin
+﻿# Build outputs
+**/bin/
+**/obj/
+
+# Visual Studio caches
+.vs/
+HospitalNet.UI/.vs/
