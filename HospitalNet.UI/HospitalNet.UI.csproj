@@ -8,4 +8,23 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Backend\BusinessLogic\**\*.cs" Link="Backend\BusinessLogic\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\Backend\Infrastructure\*.cs" Link="Backend\Infrastructure\%(Filename)%(Extension)" />
+    <Compile Include="..\Backend\Models\**\*.cs" Link="Backend\Models\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Use the MainWindow defined under the HospitalNet.UI folder; exclude the old stub at project root. -->
+    <Page Remove="MainWindow.xaml" />
+    <Compile Remove="MainWindow.xaml.cs" />
+    <Compile Update="HospitalNet.UI/MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+  </ItemGroup>
+
 </Project>

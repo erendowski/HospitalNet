@@ -24,6 +24,9 @@ namespace HospitalNet.Backend.BusinessLogic
             _dbHelper = new DatabaseHelper(connectionString);
         }
 
+        // Legacy compatibility helper used by UI.
+        public Doctor GetDoctorByID(int doctorId) => GetDoctorById(doctorId);
+
         /// <summary>
         /// Retrieves all active doctors from the database.
         /// </summary>

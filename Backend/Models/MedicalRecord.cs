@@ -63,6 +63,11 @@ namespace HospitalNet.Backend.Models
         public string VitalSigns { get; set; }
 
         /// <summary>
+        /// Optional follow-up notes captured by clinicians
+        /// </summary>
+        public string FollowUpNotes { get; set; }
+
+        /// <summary>
         /// Whether a follow-up appointment is required
         /// </summary>
         public bool FollowUpRequired { get; set; }

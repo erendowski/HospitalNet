@@ -13,6 +13,7 @@ namespace HospitalNet.Backend.BusinessLogic
     /// </summary>
     public class AppointmentManager
     {
+        private readonly string _connectionString;
         private readonly DatabaseHelper _dbHelper;
 
         /// <summary>
@@ -21,7 +22,66 @@ namespace HospitalNet.Backend.BusinessLogic
         /// <param name="connectionString">The database connection string.</param>
         public AppointmentManager(string connectionString)
         {
+            _connectionString = connectionString;
             _dbHelper = new DatabaseHelper(connectionString);
+        }
+
+        // Legacy compatibility wrapper.
+        public Appointment GetAppointmentByID(int appointmentId) => GetAppointmentById(appointmentId);
+
+        // Retrieves appointments for a doctor on a specific date (wrapper for GetDoctorSchedule).
+        public List<Appointment> GetAppointmentsByDoctorAndDate(int doctorId, DateTime date)
+        {
+            DateTime start = date.Date;
+            DateTime end = start.AddDays(1).AddTicks(-1);
+            return GetDoctorSchedule(doctorId, start, end);
+        }
+
+        // Retrieves appointments across all doctors for a single date.
+        public List<Appointment> GetAppointmentsByDate(DateTime date)
+        {
+            var doctorManager = new DoctorManager(_connectionString);
+            var doctors = doctorManager.GetAllDoctors();
+
+            var results = new List<Appointment>();
+            foreach (var doctor in doctors)
+            {
+                results.AddRange(GetAppointmentsByDoctorAndDate(doctor.DoctorID, date));
+            }
+
+            return results;
+        }
+
+        // Retrieves appointments across all doctors for a date range.
+        public List<Appointment> GetAppointmentsByDateRange(DateTime startDate, DateTime endDate)
+        {
+            var doctorManager = new DoctorManager(_connectionString);
+            var doctors = doctorManager.GetAllDoctors();
+
+            var results = new List<Appointment>();
+            foreach (var doctor in doctors)
+            {
+                results.AddRange(GetDoctorSchedule(doctor.DoctorID, startDate, endDate));
+            }
+
+            return results;
+        }
+
+        // Basic status update wrapper used by UI.
+        public bool UpdateAppointmentStatus(int appointmentId, string status)
+        {
+            if (string.Equals(status, "Completed", StringComparison.OrdinalIgnoreCase))
+            {
+                return CompleteAppointment(appointmentId);
+            }
+
+            if (string.Equals(status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+            {
+                return CancelAppointment(appointmentId, "Cancelled");
+            }
+
+            // Fallback: no-op but signal false to caller.
+            return false;
         }
 
         /// <summary>

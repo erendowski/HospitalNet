@@ -1,0 +1,79 @@
+<UserControl x:Class="HospitalNet.UI.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900"
+             Background="{StaticResource BackgroundBrush}">
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20" Background="Transparent">
+            <TextBlock Text="Application Settings" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+            <TextBlock Text="Configure database connection and application preferences" FontSize="{StaticResource FontSizeNormal}" Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Margin="20,0,20,20" Background="Transparent">
+            <StackPanel Orientation="Vertical" Background="Transparent">
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,20">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="🗄️ Database Connection" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Connection String:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                        <TextBox x:Name="ConnectionStringTextBox" Height="80" Padding="10,10,10,10" VerticalAlignment="Top" VerticalContentAlignment="Top" TextWrapping="Wrap" Style="{StaticResource StandardTextBoxStyle}" Foreground="{StaticResource TextPrimaryBrush}" IsReadOnly="True" Background="#F5F5F5" Margin="0,0,0,15"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                            <Button x:Name="TestConnectionButton" Content="🔌 Test Connection" Width="140" Height="35" Style="{StaticResource PrimaryButtonStyle}" Click="TestConnectionButton_Click" Cursor="Hand" Margin="0,0,10,0"/>
+                            <TextBlock x:Name="ConnectionStatusTextBlock" Text="Status: Unknown" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,20">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="⚙️ Application Preferences" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                            <CheckBox x:Name="AutoRefreshCheckBox" IsChecked="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <TextBlock Text="Auto-refresh dashboards (60 seconds)" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                            <TextBlock Text="Theme:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <ComboBox x:Name="ThemeComboBox" Width="200" Height="30" VerticalAlignment="Center">
+                                <ComboBoxItem Content="Light (Default)" IsSelected="True"/>
+                                <ComboBoxItem Content="Dark"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="ℹ️ About HospitalNet" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Application:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                        <TextBlock Text="HospitalNet - Hospital Management System" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Version:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                        <TextBlock Text="1.0.0" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Database:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                        <TextBlock x:Name="DatabaseVersionTextBlock" Text="Loading..." Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
+
+                        <TextBlock Text="Copyright © 2025 HospitalNet. All rights reserved." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">
+            <TextBlock x:Name="StatusTextBlock" Text="Ready" Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

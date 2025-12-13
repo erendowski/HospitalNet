@@ -24,6 +24,12 @@ namespace HospitalNet.Backend.BusinessLogic
             _dbHelper = new DatabaseHelper(connectionString);
         }
 
+        // Legacy compatibility helper used by older UI code.
+        public Patient AddPatient(Patient patient) => RegisterPatient(patient);
+
+        // Legacy compatibility helper used by older UI code.
+        public Patient GetPatientByID(int patientId) => GetPatientById(patientId);
+
         /// <summary>
         /// Registers a new patient in the system.
         /// Calls sp_CreatePatient stored procedure.

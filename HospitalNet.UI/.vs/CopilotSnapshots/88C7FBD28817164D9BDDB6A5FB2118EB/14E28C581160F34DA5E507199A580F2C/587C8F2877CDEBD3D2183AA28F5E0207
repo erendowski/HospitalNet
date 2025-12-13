@@ -1,0 +1,88 @@
+﻿<UserControl x:Class="HospitalNet.UI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000"
+             Background="{StaticResource BackgroundBrush}">
+    
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20" Background="Transparent">
+            <TextBlock Text="Hospital Dashboard" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+            <TextBlock x:Name="DateTimeTextBlock" Text="" FontSize="{StaticResource FontSizeNormal}" Foreground="{StaticResource TextSecondaryBrush}"/>
+        </StackPanel>
+
+        <!-- Summary Cards Row -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,20,20" Height="120">
+            <!-- Today's Appointments Card -->
+            <Border Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,15,0" Width="280">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="Today's Appointments" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="TodayAppointmentsMetric" Text="0" FontSize="36" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Completed Today Card -->
+            <Border Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,15,0" Width="280">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="Completed Today" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="CompletedTodayMetric" Text="0" FontSize="36" FontWeight="Bold" Foreground="{StaticResource SecondaryBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Active Doctors Card -->
+            <Border Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,15,0" Width="280">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="Active Doctors" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="ActiveDoctorsMetric" Text="0" FontSize="36" FontWeight="Bold" Foreground="{StaticResource InfoBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Total Patients Card -->
+            <Border Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,0" Width="280">
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="Total Patients" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="TotalPatientsMetric" Text="0" FontSize="36" FontWeight="Bold" Foreground="{StaticResource WarningBrush}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Today's Appointments List -->
+        <Border Grid.Row="2" Margin="20,0,20,20" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <TextBlock Grid.Row="0" Text="Appointments Today" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="20,15,20,10"/>
+
+                <!-- DataGrid -->
+                <DataGrid Grid.Row="1" x:Name="TodayAppointmentsGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" HeaderHeight="40">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Time" Binding="{Binding AppointmentDateTime, StringFormat=HH:mm}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Doctor" Binding="{Binding DoctorName}" Width="200" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" Width="200" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Reason" Binding="{Binding ReasonForVisit}" Width="300" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">
+            <TextBlock x:Name="StatusTextBlock" Text="Loading dashboard..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

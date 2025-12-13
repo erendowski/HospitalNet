@@ -61,12 +61,33 @@ namespace HospitalNet.Backend.Models
         /// <summary>
         /// Insurance provider identification number (optional)
         /// </summary>
-        public string InsuranceProviderID { get; set; }
+        public int InsuranceProviderID { get; set; }
 
         /// <summary>
         /// Summary of patient's medical history
         /// </summary>
         public string MedicalHistorySummary { get; set; }
+
+        // Legacy aliases used by earlier UI code.
+        public string Phone
+        {
+            get => PhoneNumber;
+            set => PhoneNumber = value;
+        }
+
+        public string MedicalHistory
+        {
+            get => MedicalHistorySummary;
+            set => MedicalHistorySummary = value;
+        }
+
+        public string Allergies { get; set; } = string.Empty;
+
+        public DateTime RegistrationDate
+        {
+            get => CreatedDate;
+            set => CreatedDate = value;
+        }
 
         /// <summary>
         /// Soft delete flag: 1 = active, 0 = inactive

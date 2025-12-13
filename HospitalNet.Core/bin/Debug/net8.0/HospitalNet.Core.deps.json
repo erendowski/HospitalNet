@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "HospitalNet.Core/1.0.0": {
+        "runtime": {
+          "HospitalNet.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "HospitalNet.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

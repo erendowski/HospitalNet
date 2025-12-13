@@ -370,6 +370,12 @@ namespace HospitalNet.Backend.Infrastructure
             return reader.IsDBNull(ordinal) ? string.Empty : reader.GetString(ordinal);
         }
 
+        // DataRow overloads to support callers that consume DataTable results.
+        public static string GetStringValue(DataRow row, string columnName)
+        {
+            return row.IsNull(columnName) ? string.Empty : row[columnName]?.ToString() ?? string.Empty;
+        }
+
         /// <summary>
         /// Helper method to safely get an int value from SqlDataReader, handling NULL
         /// </summary>
@@ -380,6 +386,15 @@ namespace HospitalNet.Backend.Infrastructure
         {
             int ordinal = reader.GetOrdinal(columnName);
             return reader.IsDBNull(ordinal) ? 0 : reader.GetInt32(ordinal);
+        }
+
+        // DataRow overload for integer lookups.
+        public static int GetIntValue(DataRow row, string columnName)
+        {
+            if (row.IsNull(columnName))
+                return 0;
+
+            return Convert.ToInt32(row[columnName]);
         }
 
         /// <summary>
@@ -394,6 +409,15 @@ namespace HospitalNet.Backend.Infrastructure
             return reader.IsDBNull(ordinal) ? DateTime.MinValue : reader.GetDateTime(ordinal);
         }
 
+        // DataRow overload for DateTime lookups.
+        public static DateTime GetDateTimeValue(DataRow row, string columnName)
+        {
+            if (row.IsNull(columnName))
+                return DateTime.MinValue;
+
+            return Convert.ToDateTime(row[columnName]);
+        }
+
         /// <summary>
         /// Helper method to safely get a boolean value from SqlDataReader, handling NULL
         /// </summary>
@@ -404,6 +428,15 @@ namespace HospitalNet.Backend.Infrastructure
         {
             int ordinal = reader.GetOrdinal(columnName);
             return reader.IsDBNull(ordinal) ? false : reader.GetBoolean(ordinal);
+        }
+
+        // DataRow overload for boolean lookups.
+        public static bool GetBoolValue(DataRow row, string columnName)
+        {
+            if (row.IsNull(columnName))
+                return false;
+
+            return Convert.ToBoolean(row[columnName]);
         }
 
         /// <summary>
@@ -420,6 +453,15 @@ namespace HospitalNet.Backend.Infrastructure
 
             // Handle both DATE and DATETIME columns
             return reader.GetDateTime(ordinal).Date;
+        }
+
+        // DataRow overload for date-only lookups.
+        public static DateTime GetDateValue(DataRow row, string columnName)
+        {
+            if (row.IsNull(columnName))
+                return DateTime.MinValue;
+
+            return Convert.ToDateTime(row[columnName]).Date;
         }
     }
 }
