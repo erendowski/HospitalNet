@@ -20,7 +20,8 @@ namespace HospitalNet.UI
         /// True when the app is intentionally running without a live database.
         /// This lets the UI load instantly instead of timing out on every tab.
         /// </summary>
-        public static bool OfflineMode { get; private set; } = true;
+        // Set false to attempt live DB connection by default.
+        public static bool OfflineMode { get; private set; } = false;
 
         /// <summary>
         /// Indicates whether the application initialized successfully.
@@ -36,30 +37,22 @@ namespace HospitalNet.UI
             try
             {
                 ConnectionString = GetConnectionString();
-                // Skip DB validation when no SQL Server is available so the UI can still load.
-                bool skipDbCheck = true;
-
-                // Default to offline unless a successful DB check flips it.
-                OfflineMode = true;
-
-                if (!skipDbCheck)
+                // Try DB; if it fails, exit with an explicit message.
+                var dbHelper = new DatabaseHelper(ConnectionString);
+                if (!dbHelper.TestConnection())
                 {
-                    var dbHelper = new DatabaseHelper(ConnectionString);
-                    if (!dbHelper.TestConnection())
-                    {
-                        MessageBox.Show(
-                            "Failed to connect to the database. Please check your connection settings.",
-                            "Database Connection Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
+                    MessageBox.Show(
+                        "Failed to connect to the database. Please check your connection settings.",
+                        "Database Connection Error",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
 
-                        IsInitialized = false;
-                        Shutdown(1);
-                        return;
-                    }
-
-                    OfflineMode = false;
+                    IsInitialized = false;
+                    Shutdown(1);
+                    return;
                 }
+
+                OfflineMode = false;
 
                 IsInitialized = true;
             }
@@ -83,7 +76,7 @@ namespace HospitalNet.UI
         private string GetConnectionString()
         {
             // TODO: Replace with actual configuration source
-            return "Server=.;Database=HospitalNet;Integrated Security=true;Connection Timeout=1;";
+            return "Server=localhost\\SQLEXPRESS;Database=HospitalNet;Trusted_Connection=True;TrustServerCertificate=True;Connection Timeout=5;";
         }
 
         /// <summary>
