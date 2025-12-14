@@ -50,6 +50,7 @@ namespace HospitalNet.Backend.BusinessLogic
                         OfficeLocation = DatabaseHelper.GetStringValue(reader, "OfficeLocation"),
                         YearsOfExperience = DatabaseHelper.GetIntValue(reader, "YearsOfExperience"),
                         MaxPatientCapacityPerDay = DatabaseHelper.GetIntValue(reader, "MaxPatientCapacityPerDay"),
+                        Salary = DatabaseHelper.GetDecimalValue(reader, "Salary"),
                         IsActive = DatabaseHelper.GetBoolValue(reader, "IsActive"),
                         CreatedDate = DatabaseHelper.GetDateTimeValue(reader, "CreatedDate"),
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate")
@@ -100,6 +101,7 @@ namespace HospitalNet.Backend.BusinessLogic
                         OfficeLocation = DatabaseHelper.GetStringValue(reader, "OfficeLocation"),
                         YearsOfExperience = DatabaseHelper.GetIntValue(reader, "YearsOfExperience"),
                         MaxPatientCapacityPerDay = DatabaseHelper.GetIntValue(reader, "MaxPatientCapacityPerDay"),
+                        Salary = DatabaseHelper.GetDecimalValue(reader, "Salary"),
                         IsActive = DatabaseHelper.GetBoolValue(reader, "IsActive"),
                         CreatedDate = DatabaseHelper.GetDateTimeValue(reader, "CreatedDate"),
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate")
@@ -151,6 +153,7 @@ namespace HospitalNet.Backend.BusinessLogic
                         OfficeLocation = DatabaseHelper.GetStringValue(reader, "OfficeLocation"),
                         YearsOfExperience = DatabaseHelper.GetIntValue(reader, "YearsOfExperience"),
                         MaxPatientCapacityPerDay = DatabaseHelper.GetIntValue(reader, "MaxPatientCapacityPerDay"),
+                        Salary = DatabaseHelper.GetDecimalValue(reader, "Salary"),
                         IsActive = DatabaseHelper.GetBoolValue(reader, "IsActive"),
                         CreatedDate = DatabaseHelper.GetDateTimeValue(reader, "CreatedDate"),
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate")
@@ -203,6 +206,7 @@ namespace HospitalNet.Backend.BusinessLogic
                     DatabaseHelper.CreateInputParameter("@OfficeLocation", doctor.OfficeLocation),
                     DatabaseHelper.CreateInputParameter("@YearsOfExperience", doctor.YearsOfExperience),
                     DatabaseHelper.CreateInputParameter("@MaxPatientCapacityPerDay", doctor.MaxPatientCapacityPerDay),
+                    DatabaseHelper.CreateInputParameter("@Salary", doctor.Salary),
                     DatabaseHelper.CreateInputParameter("@IsActive", doctor.IsActive),
                     DatabaseHelper.CreateOutputParameter("@DoctorID", SqlDbType.Int)
                 };
@@ -258,6 +262,7 @@ namespace HospitalNet.Backend.BusinessLogic
                         OfficeLocation = DatabaseHelper.GetStringValue(reader, "OfficeLocation"),
                         YearsOfExperience = DatabaseHelper.GetIntValue(reader, "YearsOfExperience"),
                         MaxPatientCapacityPerDay = DatabaseHelper.GetIntValue(reader, "MaxPatientCapacityPerDay"),
+                        Salary = DatabaseHelper.GetDecimalValue(reader, "Salary"),
                         IsActive = DatabaseHelper.GetBoolValue(reader, "IsActive"),
                         CreatedDate = DatabaseHelper.GetDateTimeValue(reader, "CreatedDate"),
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate")
@@ -297,11 +302,13 @@ namespace HospitalNet.Backend.BusinessLogic
                     DatabaseHelper.CreateInputParameter("@FirstName", doctor.FirstName),
                     DatabaseHelper.CreateInputParameter("@LastName", doctor.LastName),
                     DatabaseHelper.CreateInputParameter("@Specialization", doctor.Specialization),
+                    DatabaseHelper.CreateInputParameter("@LicenseNumber", doctor.LicenseNumber),
                     DatabaseHelper.CreateInputParameter("@PhoneNumber", doctor.PhoneNumber),
                     DatabaseHelper.CreateInputParameter("@Email", doctor.Email),
                     DatabaseHelper.CreateInputParameter("@OfficeLocation", doctor.OfficeLocation),
                     DatabaseHelper.CreateInputParameter("@YearsOfExperience", doctor.YearsOfExperience),
                     DatabaseHelper.CreateInputParameter("@MaxPatientCapacityPerDay", doctor.MaxPatientCapacityPerDay),
+                    DatabaseHelper.CreateInputParameter("@Salary", doctor.Salary),
                     DatabaseHelper.CreateInputParameter("@IsActive", doctor.IsActive)
                 };
 

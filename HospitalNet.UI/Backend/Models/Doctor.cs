@@ -14,6 +14,7 @@ namespace HospitalNet.Backend.Models
         public string OfficeLocation { get; set; }
         public int YearsOfExperience { get; set; }
         public int MaxPatientCapacityPerDay { get; set; }
+        public decimal Salary { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }

@@ -37,7 +37,12 @@
                 <TextBlock Grid.Column="2" Text="End Date:" VerticalAlignment="Center" Margin="20,0,10,0" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                 <DatePicker Grid.Column="3" x:Name="EndDatePicker" Height="35" VerticalAlignment="Center"/>
 
-                <Button Grid.Column="5" x:Name="GenerateReportButton" Content="📊 Generate Report" Width="160" Height="35" Style="{StaticResource PrimaryButtonStyle}" Click="GenerateReportButton_Click" Cursor="Hand"/>
+                <Button Grid.Column="5" x:Name="GenerateReportButton" Width="160" Height="35" Style="{StaticResource PrimaryButtonStyle}" Click="GenerateReportButton_Click" Cursor="Hand">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE9F9;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Text="Generate Report" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
             </Grid>
         </Border>
 

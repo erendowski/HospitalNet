@@ -130,14 +130,20 @@ namespace HospitalNet.Backend.BusinessLogic
                 var outputs = _dbHelper.ExecuteNonQueryWithOutputs("sp_CreateAppointment", parameters.ToArray());
 
                 // Check if there was an error (double-booking or other constraint violation)
-                string errorMessage = (string)outputs["@ErrorMessage"];
+                object errorObj = outputs["@ErrorMessage"];
+                string errorMessage = (errorObj != null && errorObj != DBNull.Value) ? errorObj.ToString() : null;
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
                     throw new Exception($"Failed to schedule appointment: {errorMessage}");
                 }
 
                 // Extract the newly created AppointmentID
-                appointment.AppointmentID = (int)outputs["@AppointmentID"];
+                object appointmentIdObj = outputs["@AppointmentID"];
+                if (appointmentIdObj == null || appointmentIdObj == DBNull.Value)
+                {
+                    throw new Exception("Failed to create appointment - no ID returned.");
+                }
+                appointment.AppointmentID = Convert.ToInt32(appointmentIdObj);
                 appointment.CreatedDate = DateTime.Now;
                 appointment.UpdatedDate = DateTime.Now;
 
@@ -220,12 +226,16 @@ namespace HospitalNet.Backend.BusinessLogic
                     throw new ArgumentException("Duration must be between 1 and 480 minutes.", nameof(durationMinutes));
                 }
 
+                // Calculate end time from start time and duration
+                DateTime startTime = appointmentDateTime;
+                DateTime endTime = appointmentDateTime.AddMinutes(durationMinutes);
+
                 // Create parameters for stored procedure
                 var parameters = new[]
                 {
-                    DatabaseHelper.CreateInputParameter("@DoctorID", doctorId),
-                    DatabaseHelper.CreateInputParameter("@AppointmentDateTime", appointmentDateTime),
-                    DatabaseHelper.CreateInputParameter("@DurationMinutes", durationMinutes)
+                    DatabaseHelper.CreateInputParameter("@DoctorId", doctorId),
+                    DatabaseHelper.CreateInputParameter("@StartTime", startTime),
+                    DatabaseHelper.CreateInputParameter("@EndTime", endTime)
                 };
 
                 // Execute stored procedure - returns 1 if available, 0 if not

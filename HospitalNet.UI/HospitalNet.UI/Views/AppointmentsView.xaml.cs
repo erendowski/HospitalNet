@@ -219,6 +219,7 @@ namespace HospitalNet.UI.Views
                             DoctorID = _selectedDoctor.DoctorID,
                             PatientID = patientId,
                             AppointmentDateTime = appointmentDateTime,
+                            DurationMinutes = 30, // Default 30 minutes
                             ReasonForVisit = reason,
                             Status = "Scheduled"
                         });

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="1000"
+             d:DesignHeight="700" d:DesignWidth="1200"
              Background="{StaticResource BackgroundBrush}">
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
@@ -14,50 +14,226 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Header -->
         <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20" Background="Transparent">
-            <TextBlock Text="Doctor Dashboard" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
-            <TextBlock Text="View schedule and complete patient visits" FontSize="{StaticResource FontSizeNormal}" Foreground="{StaticResource TextSecondaryBrush}"/>
+            <TextBlock Text="Doctors Management" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+            <TextBlock Text="Add doctors, manage their information, and view appointments" FontSize="{StaticResource FontSizeNormal}" Foreground="{StaticResource TextSecondaryBrush}"/>
         </StackPanel>
 
-        <Border Grid.Row="1" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Height="60" VerticalAlignment="Top">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Select Date:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                <DatePicker x:Name="ScheduleDatePicker" Width="200" Height="35" VerticalAlignment="Center" SelectedDateChanged="ScheduleDatePicker_SelectedDateChanged"/>
-                <TextBlock x:Name="DateInfoTextBlock" Text="" Foreground="{StaticResource TextSecondaryBrush}" Margin="20,0,0,0" VerticalAlignment="Center" FontSize="{StaticResource FontSizeSmall}"/>
-            </StackPanel>
-        </Border>
-
-        <Border Grid.Row="2" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+        <!-- Toolbar -->
+        <Border Grid.Row="1" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Row="0" Text="Today's Appointments" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="20,15,20,10"/>
+                <TextBlock Grid.Column="0" Text="Search:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                <TextBox Grid.Column="1" x:Name="SearchTextBox" Height="35" Padding="10,0,10,0" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Foreground="{StaticResource TextPrimaryBrush}" TextChanged="SearchTextBox_TextChanged"/>
 
-                <DataGrid Grid.Row="1" x:Name="AppointmentsGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="40" ColumnHeaderHeight="40">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding AppointmentDateTime, StringFormat=HH:mm}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" Width="200" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Reason" Binding="{Binding ReasonForVisit}" Width="300" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTemplateColumn Header="Action" Width="180">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <Button Content="✓ Complete Visit" Width="140" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="CompleteVisit_Click" Tag="{Binding AppointmentID}" Cursor="Hand"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <StackPanel Grid.Column="3" Orientation="Horizontal">
+                    <Button x:Name="AddDoctorButton" Width="140" Height="35" Style="{StaticResource PrimaryButtonStyle}" Click="AddDoctorButton_Click" Cursor="Hand" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="Add Doctor" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="RefreshButton" Width="100" Height="35" Style="{StaticResource SecondaryButtonStyle}" Click="RefreshButton_Click" Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE72C;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </Grid>
         </Border>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">
-            <TextBlock x:Name="StatusTextBlock" Text="Loading schedule..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
-        </StackPanel>
+        <!-- Main Content - Split View -->
+        <Grid Grid.Row="2" Margin="20,0,20,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="400"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Doctors List -->
+            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Doctors List" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="20,15,20,10"/>
+
+                    <DataGrid Grid.Row="1" x:Name="DoctorsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="40" ColumnHeaderHeight="40" SelectionChanged="DoctorsDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding FullName}" Width="150" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Specialization" Binding="{Binding Specialization}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="License" Binding="{Binding LicenseNumber}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Salary" Binding="{Binding Salary, StringFormat=₺{0:N2}}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Experience" Binding="{Binding YearsOfExperience}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTemplateColumn Header="Actions" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Button Width="40" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="EditDoctor_Click" Tag="{Binding DoctorID}" ToolTip="Edit" Cursor="Hand">
+                                                <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Button>
+                                            <Button Width="40" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="DeleteDoctor_Click" Tag="{Binding DoctorID}" ToolTip="Delete" Cursor="Hand">
+                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <!-- Doctor Details & Appointments Panel -->
+            <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Doctor Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="15,15,15,10"/>
+
+                    <!-- Doctor Info Card -->
+                    <Border Grid.Row="1" Margin="15,0,15,15" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15">
+                        <StackPanel x:Name="DoctorDetailsPanel">
+                            <TextBlock x:Name="DoctorNameTextBlock" Text="Select a doctor" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
+                            <TextBlock x:Name="DoctorSpecTextBlock" Text="" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
+                            
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
+                                    <TextBlock Text="Email:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="DoctorEmailTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
+                                    <TextBlock Text="Phone:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="DoctorPhoneTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,8">
+                                    <TextBlock Text="Office:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="DoctorOfficeTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
+                                    <TextBlock Text="Salary:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="DoctorSalaryTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0">
+                                    <TextBlock Text="Experience:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="DoctorExperienceTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="1">
+                                    <TextBlock Text="Max Patients/Day:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                    <TextBlock x:Name="DoctorMaxPatientsTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Appointments Header -->
+                    <Grid Grid.Row="2" Margin="15,0,15,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="Appointments" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="2" x:Name="AddAppointmentButton" Width="85" Height="28" Style="{StaticResource PrimaryButtonStyle}" Click="AddAppointmentButton_Click" Cursor="Hand" ToolTip="Add new appointment">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Text="New" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- New Appointment Form (hidden by default) -->
+                    <Border Grid.Row="3" x:Name="NewAppointmentPanel" Visibility="Collapsed" Margin="15,0,15,10" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                        <StackPanel>
+                            <TextBlock Text="New Appointment" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                            
+                            <TextBlock Text="Patient:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                            <ComboBox x:Name="PatientComboBox" Height="30" Margin="0,0,0,8" DisplayMemberPath="FullName" SelectedValuePath="PatientID"/>
+
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Date:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                    <DatePicker x:Name="AppointmentDatePicker" Height="30"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Time (HH:mm):" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="AppointmentTimeTextBox" Height="30" Padding="8,0" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Text="09:00"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="Duration (min):" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="DurationTextBox" Height="30" Padding="8,0" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Text="30"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Reason:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="ReasonTextBox" Height="50" Padding="8,5" TextWrapping="Wrap" Style="{StaticResource StandardTextBoxStyle}" Margin="0,0,0,10"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="Cancel" Width="70" Height="28" Style="{StaticResource SecondaryButtonStyle}" Click="CancelAppointmentForm_Click" Cursor="Hand" Margin="0,0,8,0"/>
+                                <Button Content="Book" Width="70" Height="28" Style="{StaticResource PrimaryButtonStyle}" Click="BookAppointment_Click" Cursor="Hand"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Appointments List -->
+                    <DataGrid Grid.Row="4" x:Name="AppointmentsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" ColumnHeaderHeight="35" Margin="15,0,15,15">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Time" Binding="{Binding AppointmentTime, StringFormat=HH:mm}" Width="60" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Reason" Binding="{Binding ReasonForVisit}" Width="*" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15,10">
+            <TextBlock x:Name="StatusTextBlock" Text="Ready" Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}"/>
+        </Border>
     </Grid>
 </UserControl>

@@ -45,6 +45,7 @@ CREATE TABLE dbo.Doctors
     OfficeLocation         NVARCHAR(255) NOT NULL,
     YearsOfExperience      INT NOT NULL DEFAULT(0),
     MaxPatientCapacityPerDay INT NOT NULL DEFAULT(0),
+    Salary                 DECIMAL(18,2) NOT NULL DEFAULT(0),
     IsActive               BIT NOT NULL DEFAULT(1),
     CreatedDate            DATETIME2 NOT NULL DEFAULT(sysdatetime()),
     UpdatedDate            DATETIME2 NOT NULL DEFAULT(sysdatetime())
@@ -210,13 +211,14 @@ CREATE OR ALTER PROCEDURE dbo.sp_CreateDoctor
     @OfficeLocation NVARCHAR(255),
     @YearsOfExperience INT = 0,
     @MaxPatientCapacityPerDay INT = 0,
+    @Salary DECIMAL(18,2) = 0,
     @IsActive BIT = 1,
     @DoctorID INT OUTPUT
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.Doctors(FirstName,LastName,Specialization,LicenseNumber,PhoneNumber,Email,OfficeLocation,YearsOfExperience,MaxPatientCapacityPerDay,IsActive)
-    VALUES(@FirstName,@LastName,@Specialization,@LicenseNumber,@PhoneNumber,@Email,@OfficeLocation,@YearsOfExperience,@MaxPatientCapacityPerDay,@IsActive);
+    INSERT INTO dbo.Doctors(FirstName,LastName,Specialization,LicenseNumber,PhoneNumber,Email,OfficeLocation,YearsOfExperience,MaxPatientCapacityPerDay,Salary,IsActive)
+    VALUES(@FirstName,@LastName,@Specialization,@LicenseNumber,@PhoneNumber,@Email,@OfficeLocation,@YearsOfExperience,@MaxPatientCapacityPerDay,@Salary,@IsActive);
     SET @DoctorID = SCOPE_IDENTITY();
 END
 GO
@@ -264,6 +266,7 @@ CREATE OR ALTER PROCEDURE dbo.sp_UpdateDoctor
     @OfficeLocation NVARCHAR(255),
     @YearsOfExperience INT = 0,
     @MaxPatientCapacityPerDay INT = 0,
+    @Salary DECIMAL(18,2) = 0,
     @IsActive BIT = 1
 AS
 BEGIN
@@ -272,7 +275,7 @@ BEGIN
     SET FirstName=@FirstName, LastName=@LastName, Specialization=@Specialization,
         LicenseNumber=@LicenseNumber, PhoneNumber=@PhoneNumber, Email=@Email,
         OfficeLocation=@OfficeLocation, YearsOfExperience=@YearsOfExperience,
-        MaxPatientCapacityPerDay=@MaxPatientCapacityPerDay, IsActive=@IsActive, UpdatedDate=sysdatetime()
+        MaxPatientCapacityPerDay=@MaxPatientCapacityPerDay, Salary=@Salary, IsActive=@IsActive, UpdatedDate=sysdatetime()
     WHERE DoctorID=@DoctorId;
 END
 GO

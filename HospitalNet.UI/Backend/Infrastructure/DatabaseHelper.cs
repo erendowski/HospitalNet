@@ -329,15 +329,24 @@ namespace HospitalNet.Backend.Infrastructure
         /// </summary>
         /// <param name="parameterName">Parameter name (e.g., "@AppointmentID")</param>
         /// <param name="sqlType">SQL data type (e.g., SqlDbType.Int)</param>
+        /// <param name="size">Size for string types (default -1 for MAX)</param>
         /// <returns>SqlParameter ready to use</returns>
-        public static SqlParameter CreateOutputParameter(string parameterName, SqlDbType sqlType)
+        public static SqlParameter CreateOutputParameter(string parameterName, SqlDbType sqlType, int size = -1)
         {
-            return new SqlParameter
+            var param = new SqlParameter
             {
                 ParameterName = parameterName,
                 SqlDbType = sqlType,
                 Direction = ParameterDirection.Output
             };
+
+            // Set size for string types
+            if (sqlType == SqlDbType.NVarChar || sqlType == SqlDbType.VarChar || sqlType == SqlDbType.NChar || sqlType == SqlDbType.Char)
+            {
+                param.Size = size == -1 ? 4000 : size; // Default to 4000 for nvarchar
+            }
+
+            return param;
         }
 
         /// <summary>
@@ -437,6 +446,27 @@ namespace HospitalNet.Backend.Infrastructure
                 return DateTime.MinValue;
 
             return Convert.ToDateTime(row[columnName]);
+        }
+
+        /// <summary>
+        /// Helper method to safely get a decimal value from SqlDataReader, handling NULL
+        /// </summary>
+        /// <param name="reader">SqlDataReader instance</param>
+        /// <param name="columnName">Column name</param>
+        /// <returns>Decimal value or 0 if NULL</returns>
+        public static decimal GetDecimalValue(SqlDataReader reader, string columnName)
+        {
+            int ordinal = reader.GetOrdinal(columnName);
+            return reader.IsDBNull(ordinal) ? 0m : reader.GetDecimal(ordinal);
+        }
+
+        // DataRow overload for decimal lookups.
+        public static decimal GetDecimalValue(DataRow row, string columnName)
+        {
+            if (row.IsNull(columnName))
+                return 0m;
+
+            return Convert.ToDecimal(row[columnName]);
         }
     }
 }

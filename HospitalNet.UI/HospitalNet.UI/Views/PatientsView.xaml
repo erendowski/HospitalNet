@@ -21,9 +21,14 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,20,20" Height="40" VerticalAlignment="Center">
             <TextBox x:Name="SearchTextBox" Width="300" Height="40" Padding="12,0,12,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Foreground="{StaticResource TextPrimaryBrush}" TextChanged="SearchTextBox_TextChanged" Margin="0,0,10,0"/>
-            <TextBlock Text="🔍" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="16"/>
+            <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"/>
-            <Button x:Name="AddPatientButton" Content="➕ Add Patient" Width="150" Height="40" VerticalAlignment="Center" Style="{StaticResource PrimaryButtonStyle}" Click="AddPatientButton_Click" Cursor="Hand" Margin="10,0,0,0"/>
+            <Button x:Name="AddPatientButton" Width="150" Height="40" VerticalAlignment="Center" Style="{StaticResource PrimaryButtonStyle}" Click="AddPatientButton_Click" Cursor="Hand" Margin="10,0,0,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="14" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Text="Add Patient" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <Border Grid.Row="2" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
@@ -41,8 +46,18 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <Button Content="✎ Edit" Width="60" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="EditPatient_Click" Tag="{Binding PatientID}" Cursor="Hand"/>
-                                    <Button Content="🗑 Remove" Width="70" Height="28" Margin="2" Style="{StaticResource DangerButtonStyle}" Click="DeletePatient_Click" Tag="{Binding PatientID}" Cursor="Hand"/>
+                                    <Button Width="60" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="EditPatient_Click" Tag="{Binding PatientID}" Cursor="Hand">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <TextBlock Text="Edit" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Width="75" Height="28" Margin="2" Style="{StaticResource DangerButtonStyle}" Click="DeletePatient_Click" Tag="{Binding PatientID}" Cursor="Hand">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <TextBlock Text="Remove" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
                                 </StackPanel>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
