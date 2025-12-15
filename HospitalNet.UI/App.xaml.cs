@@ -1,6 +1,8 @@
-﻿using System;
+﻿using HospitalNet.Backend.Infrastructure;
+using System;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Windows;
-using HospitalNet.Backend.Infrastructure;
 
 namespace HospitalNet.UI
 {
@@ -36,7 +38,12 @@ namespace HospitalNet.UI
         {
             try
             {
+                var profile = ActiveProfile;    
                 ConnectionString = GetConnectionString();
+
+                using var con = new SqlConnection(ConnectionString);
+                con.Open();
+
                 // Try DB; if it fails, exit with an explicit message.
                 var dbHelper = new DatabaseHelper(ConnectionString);
                 if (!dbHelper.TestConnection())
@@ -69,14 +76,17 @@ namespace HospitalNet.UI
             }
         }
 
+        public static string ActiveProfile =>
+            ConfigurationManager.AppSettings["DbProfile"] ?? "Azure";
         /// <summary>
         /// Gets the database connection string.
         /// In production, this should be read from app.config or appsettings.json.
         /// </summary>
-        private string GetConnectionString()
+        public static string GetConnectionString()
         {
-            // TODO: Replace with actual configuration source
-            return "Server=localhost\\SQLEXPRESS;Database=HospitalNet;Trusted_Connection=True;TrustServerCertificate=True;Connection Timeout=5;";
+            return ActiveProfile.Equals("Local", StringComparison.OrdinalIgnoreCase)
+                ? ConfigurationManager.ConnectionStrings["LocalSql"].ConnectionString
+                : ConfigurationManager.ConnectionStrings["AzureSql"].ConnectionString;
         }
 
         /// <summary>
