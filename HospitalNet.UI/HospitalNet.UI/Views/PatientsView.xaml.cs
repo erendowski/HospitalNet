@@ -46,7 +46,7 @@ namespace HospitalNet.UI.Views
                     return;
                 }
 
-                var dbHelper = new DatabaseHelper(App.ConnectionString);
+                var dbHelper = new DatabaseHelper(App.GetConnectionString());
                 if (!dbHelper.TestConnection())
                 {
                     _patientManager = null;
@@ -56,7 +56,7 @@ namespace HospitalNet.UI.Views
                     return;
                 }
 
-                _patientManager = new PatientManager(App.ConnectionString);
+                _patientManager = new PatientManager(App.GetConnectionString());
                 var patients = _patientManager.GetAllActivePatients();
 
                 _allPatients = new ObservableCollection<Patient>(patients);
@@ -101,12 +101,26 @@ namespace HospitalNet.UI.Views
         private void AddPatientButton_Click(object sender, RoutedEventArgs e)
         {
             var addPatientDialog = new AddPatientDialog();
+            addPatientDialog.Owner = Window.GetWindow(this);
             bool? result = addPatientDialog.ShowDialog();
 
             if (result == true)
             {
-                LoadPatients();
-                StatusTextBlock.Text = "New patient added successfully";
+                // Update UI immediately from the dialog result (avoids relying on a full reload).
+                if (addPatientDialog.SavedPatient != null)
+                {
+                    _allPatients.Add(addPatientDialog.SavedPatient);
+
+                    // Re-apply filter so the grid updates consistently.
+                    SearchTextBox_TextChanged(SearchTextBox, null);
+
+                    StatusTextBlock.Text = "New patient added successfully";
+                }
+                else
+                {
+                    LoadPatients();
+                    // Don't overwrite LoadPatients() status in case it failed.
+                }
             }
         }
 
@@ -132,12 +146,13 @@ namespace HospitalNet.UI.Views
                 }
 
                 var editPatientDialog = new AddPatientDialog(selectedPatient);
+                editPatientDialog.Owner = Window.GetWindow(this);
                 bool? result = editPatientDialog.ShowDialog();
 
                 if (result == true)
                 {
                     LoadPatients();
-                    StatusTextBlock.Text = "Patient updated successfully";
+                    // Don't overwrite LoadPatients() status in case it failed.
                 }
             }
         }

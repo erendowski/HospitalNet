@@ -14,6 +14,8 @@ namespace HospitalNet.UI.Dialogs
         private Patient _editingPatient;
         private readonly bool _isEditMode;
 
+        public Patient SavedPatient { get; private set; }
+
         public AddPatientDialog()
         {
             InitializeComponent();
@@ -89,7 +91,7 @@ namespace HospitalNet.UI.Dialogs
                     return;
                 }
 
-                _patientManager = new PatientManager(App.ConnectionString);
+                _patientManager = new PatientManager(App.GetConnectionString());
 
                 if (_isEditMode)
                 {
@@ -110,6 +112,7 @@ namespace HospitalNet.UI.Dialogs
 
                     _patientManager.UpdatePatient(_editingPatient);
                     StatusTextBlock.Text = "Patient updated successfully";
+                    SavedPatient = _editingPatient;
                 }
                 else
                 {
@@ -131,7 +134,7 @@ namespace HospitalNet.UI.Dialogs
                         IsActive = true
                     };
 
-                    _patientManager.AddPatient(newPatient);
+                    SavedPatient = _patientManager.AddPatient(newPatient);
                     StatusTextBlock.Text = "Patient added successfully";
                 }
 
@@ -140,7 +143,6 @@ namespace HospitalNet.UI.Dialogs
             }
             catch (Exception ex)
             {
-                StatusTextBlock.Text = $"Error: {ex.Message}";
                 MessageBox.Show(
                     $"Failed to save patient:\n{ex.Message}",
                     "Save Error",

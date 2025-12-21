@@ -13,14 +13,29 @@ namespace HospitalNet.UI.Views
     /// </summary>
     public partial class DashboardView : UserControl
     {
+        private sealed class AppointmentCardItem
+        {
+            public int AppointmentID { get; set; }
+            public DateTime AppointmentDateTime { get; set; }
+            public string DoctorName { get; set; }
+            public string PatientName { get; set; }
+            public string ReasonForVisit { get; set; }
+            public string Status { get; set; }
+
+            public string TimeText => AppointmentDateTime.ToString("HH:mm");
+        }
+
         private DoctorManager _doctorManager;
         private PatientManager _patientManager;
         private AppointmentManager _appointmentManager;
         private DispatcherTimer _refreshTimer;
+        private DateTime _selectedDate;
 
         public DashboardView()
         {
             InitializeComponent();
+            _selectedDate = DateTime.Today;
+
             if (App.OfflineMode)
             {
                 SetOfflineState("Dashboard offline (no database connection).");
@@ -35,6 +50,7 @@ namespace HospitalNet.UI.Views
                 return;
             }
 
+            AppointmentDatePicker.SelectedDate = _selectedDate;
             LoadDashboardData();
             StartAutoRefresh();
         }
@@ -57,7 +73,7 @@ namespace HospitalNet.UI.Views
                 }
 
                 _doctorManager = new DoctorManager(App.ConnectionString);
-                _patientManager = new PatientManager(App.ConnectionString);
+                _patientManager = new PatientManager(App.GetConnectionString());
                 _appointmentManager = new AppointmentManager(App.ConnectionString);
             }
             catch (Exception ex)
@@ -78,23 +94,34 @@ namespace HospitalNet.UI.Views
 
                 DateTimeTextBlock.Text = DateTime.Now.ToString("dddd, MMMM d, yyyy - h:mm tt");
 
+                // Always compute metrics for today
                 var todayAppointments = _appointmentManager.GetAppointmentsByDate(DateTime.Today);
-
                 int completedToday = 0;
-                var displayAppointments = new ObservableCollection<dynamic>();
-
                 foreach (var apt in todayAppointments)
                 {
                     if (apt.Status == "Completed")
                         completedToday++;
+                }
 
+                TodayAppointmentsMetric.Text = todayAppointments.Count.ToString();
+                CompletedTodayMetric.Text = completedToday.ToString();
+
+                // Load appointments for the currently selected date into the cards list
+                var selectedAppointments = _selectedDate.Date == DateTime.Today
+                    ? todayAppointments
+                    : _appointmentManager.GetAppointmentsByDate(_selectedDate.Date);
+
+                var displayAppointments = new ObservableCollection<AppointmentCardItem>();
+
+                foreach (var apt in selectedAppointments)
+                {
                     var doctor = _doctorManager.GetDoctorByID(apt.DoctorID);
                     var patient = _patientManager.GetPatientByID(apt.PatientID);
 
                     string doctorName = doctor != null ? $"Dr. {doctor.FirstName} {doctor.LastName}" : "Unknown";
                     string patientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown";
 
-                    displayAppointments.Add(new
+                    displayAppointments.Add(new AppointmentCardItem
                     {
                         AppointmentID = apt.AppointmentID,
                         AppointmentDateTime = apt.AppointmentDateTime,
@@ -105,9 +132,7 @@ namespace HospitalNet.UI.Views
                     });
                 }
 
-                TodayAppointmentsGrid.ItemsSource = displayAppointments;
-                TodayAppointmentsMetric.Text = todayAppointments.Count.ToString();
-                CompletedTodayMetric.Text = completedToday.ToString();
+                TodayAppointmentsItems.ItemsSource = displayAppointments;
 
                 try
                 {
@@ -149,13 +174,22 @@ namespace HospitalNet.UI.Views
             _refreshTimer?.Stop();
         }
 
+        private void AppointmentDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (AppointmentDatePicker.SelectedDate.HasValue)
+            {
+                _selectedDate = AppointmentDatePicker.SelectedDate.Value.Date;
+                LoadDashboardData();
+            }
+        }
+
         private void SetOfflineState(string statusMessage)
         {
             _doctorManager = null;
             _patientManager = null;
             _appointmentManager = null;
 
-            TodayAppointmentsGrid.ItemsSource = null;
+            TodayAppointmentsItems.ItemsSource = null;
             TodayAppointmentsMetric.Text = "-";
             CompletedTodayMetric.Text = "-";
             ActiveDoctorsMetric.Text = "-";
