@@ -26,6 +26,8 @@ namespace HospitalNet.UI.Views
         public DoctorsView()
         {
             InitializeComponent();
+
+            ApplyAuthorization();
             if (App.OfflineMode)
             {
                 DoctorsDataGrid.ItemsSource = null;
@@ -123,6 +125,16 @@ namespace HospitalNet.UI.Views
         {
             try
             {
+                if (App.CurrentUser != null && !App.CurrentUser.IsAdmin)
+                {
+                    MessageBox.Show(
+                        "You do not have permission to add doctors.",
+                        "Permission Denied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+
                 var dialog = new AddDoctorDialog();
                 dialog.Owner = Window.GetWindow(this);
                 bool? result = dialog.ShowDialog();
@@ -136,6 +148,19 @@ namespace HospitalNet.UI.Views
             catch (Exception ex)
             {
                 StatusTextBlock.Text = $"Error: {ex.Message}";
+            }
+        }
+
+        private void ApplyAuthorization()
+        {
+            bool canAddDoctor = App.CurrentUser == null || App.CurrentUser.IsAdmin;
+
+            if (AddDoctorButton != null)
+            {
+                AddDoctorButton.IsEnabled = canAddDoctor;
+                AddDoctorButton.ToolTip = canAddDoctor
+                    ? "Add Doctor"
+                    : "Admin permission required";
             }
         }
 

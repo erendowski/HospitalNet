@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:HospitalNet.UI"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
-             StartupUri="HospitalNet.UI/MainWindow.xaml"
              Startup="Application_Startup"
              Exit="Application_Exit"
              DispatcherUnhandledException="Application_DispatcherUnhandledException">

@@ -46,7 +46,16 @@ namespace HospitalNet.UI.Views
                     return;
                 }
 
-                var dbHelper = new DatabaseHelper(App.GetConnectionString());
+                if (string.IsNullOrWhiteSpace(App.ConnectionString))
+                {
+                    _patientManager = null;
+                    PatientsDataGrid.ItemsSource = null;
+                    StatusTextBlock.Text = "Patients offline (no active database connection).";
+                    CountTextBlock.Text = "Total: -";
+                    return;
+                }
+
+                var dbHelper = new DatabaseHelper(App.ConnectionString);
                 if (!dbHelper.TestConnection())
                 {
                     _patientManager = null;
@@ -56,7 +65,7 @@ namespace HospitalNet.UI.Views
                     return;
                 }
 
-                _patientManager = new PatientManager(App.GetConnectionString());
+                _patientManager = new PatientManager(App.ConnectionString);
                 var patients = _patientManager.GetAllActivePatients();
 
                 _allPatients = new ObservableCollection<Patient>(patients);

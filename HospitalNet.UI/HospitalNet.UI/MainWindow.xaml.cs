@@ -29,6 +29,8 @@ namespace HospitalNet.UI
                 ["Settings"] = () => new SettingsView(),
             };
 
+            ApplyAuthorization();
+
             // Show default view
             ShowView("Dashboard");
 
@@ -36,6 +38,22 @@ namespace HospitalNet.UI
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += (s, e) => TimestampTextBlock.Text = DateTime.Now.ToString("g");
             _timer.Start();
+        }
+
+        private void ApplyAuthorization()
+        {
+            var session = App.CurrentUser;
+
+            string userName = session?.Username ?? "Unknown user";
+            string roleLabel = (session != null && session.IsAdmin) ? "Admin" : "Normal user";
+            UserInfoTextBlock.Text = $"{userName} ({roleLabel})";
+
+            if (session != null && !session.IsAdmin)
+            {
+                // Hide Doctors navigation and prevent navigation to Doctors view for normal users
+                DoctorsButton.Visibility = Visibility.Collapsed;
+                _views.Remove("Doctors");
+            }
         }
 
         private void NavigationButton_Click(object sender, RoutedEventArgs e)

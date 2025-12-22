@@ -73,7 +73,7 @@ namespace HospitalNet.UI.Views
                 }
 
                 _doctorManager = new DoctorManager(App.ConnectionString);
-                _patientManager = new PatientManager(App.GetConnectionString());
+                _patientManager = new PatientManager(App.ConnectionString);
                 _appointmentManager = new AppointmentManager(App.ConnectionString);
             }
             catch (Exception ex)

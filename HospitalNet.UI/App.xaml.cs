@@ -1,7 +1,11 @@
 ﻿using HospitalNet.Backend.Infrastructure;
+using HospitalNet.UI.Dialogs;
+using HospitalNet.UI.Security;
 using System;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
+using System.Security.Principal;
 using System.Windows;
 
 namespace HospitalNet.UI
@@ -12,11 +16,23 @@ namespace HospitalNet.UI
     /// </summary>
     public partial class App : Application
     {
+        private static readonly string[] AdminDbRoleNames =
+        {
+            "HospitalAdminRole",   // from your SQL script
+            "HospitalNetAdmin",    // legacy/alternate name
+            "HospitalNet Admin",   // legacy name with space
+        };
+
         /// <summary>
         /// Application-wide connection string for database access.
         /// Shared across all Manager instances.
         /// </summary>
         public static string ConnectionString { get; private set; }
+
+        /// <summary>
+        /// Current signed-in user for the running session.
+        /// </summary>
+        public static UserSession CurrentUser { get; private set; }
 
         /// <summary>
         /// True when the app is intentionally running without a live database.
@@ -38,11 +54,22 @@ namespace HospitalNet.UI
         {
             try
             {
-                var profile = ActiveProfile;    
-                ConnectionString = GetConnectionString();
+                ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-                using var con = new SqlConnection(ConnectionString);
-                con.Open();
+                var baseConnectionString = GetConnectionString();
+                var baseBuilder = new SqlConnectionStringBuilder(baseConnectionString);
+                bool defaultWindowsAuth = baseBuilder.IntegratedSecurity;
+
+                var loginWindow = new LoginWindow(baseConnectionString, defaultWindowsAuth);
+                bool? loginResult = loginWindow.ShowDialog();
+                if (loginResult != true || string.IsNullOrWhiteSpace(loginWindow.EffectiveConnectionString))
+                {
+                    IsInitialized = false;
+                    Shutdown(0);
+                    return;
+                }
+
+                ConnectionString = loginWindow.EffectiveConnectionString;
 
                 // Try DB; if it fails, exit with an explicit message.
                 var dbHelper = new DatabaseHelper(ConnectionString);
@@ -59,9 +86,30 @@ namespace HospitalNet.UI
                     return;
                 }
 
-                OfflineMode = false;
+                var signedInName = loginWindow.SignedInUsername
+                    ?? WindowsIdentity.GetCurrent().Name
+                    ?? "Unknown";
 
+                bool isAdmin = false;
+                foreach (var roleName in AdminDbRoleNames)
+                {
+                    if (IsCurrentUserMemberOfDbRole(ConnectionString, roleName))
+                    {
+                        isAdmin = true;
+                        break;
+                    }
+                }
+
+                CurrentUser = new UserSession(signedInName, isAdmin);
+
+                OfflineMode = false;
                 IsInitialized = true;
+
+                var mainWindow = new MainWindow();
+                MainWindow = mainWindow;
+                mainWindow.Show();
+
+                ShutdownMode = ShutdownMode.OnMainWindowClose;
             }
             catch (Exception ex)
             {
@@ -73,6 +121,33 @@ namespace HospitalNet.UI
 
                 IsInitialized = false;
                 Shutdown(1);
+            }
+        }
+
+        private static bool IsCurrentUserMemberOfDbRole(string connectionString, string roleName)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(roleName))
+                return false;
+
+            try
+            {
+                using var con = new SqlConnection(connectionString);
+                con.Open();
+
+                using var cmd = con.CreateCommand();
+                cmd.CommandType = CommandType.Text;
+                cmd.CommandText = "SELECT IS_ROLEMEMBER(@RoleName)";
+                cmd.Parameters.Add(new SqlParameter("@RoleName", SqlDbType.NVarChar, 128) { Value = roleName });
+
+                var result = cmd.ExecuteScalar();
+                if (result == null || result == DBNull.Value)
+                    return false;
+
+                return Convert.ToInt32(result) == 1;
+            }
+            catch
+            {
+                return false;
             }
         }
 
