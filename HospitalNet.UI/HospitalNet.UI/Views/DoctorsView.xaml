@@ -98,14 +98,15 @@
 
             <!-- Doctor Details & Appointments Panel -->
             <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Doctor Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="15,15,15,10"/>
 
@@ -228,7 +229,8 @@
                             <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                </Grid>
+                    </Grid>
+                </ScrollViewer>
             </Border>
         </Grid>
 
