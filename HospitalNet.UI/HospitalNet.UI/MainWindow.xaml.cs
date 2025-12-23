@@ -50,9 +50,10 @@ namespace HospitalNet.UI
 
             if (session != null && !session.IsAdmin)
             {
-                // Normal users can view doctors, but cannot add/edit/deactivate doctors.
-                DoctorsButton.Visibility = Visibility.Visible;
-                DoctorsButton.ToolTip = "View doctors (admin required for doctor management actions)";
+                // Per requirement: hide Doctors section entirely for normal users.
+                DoctorsButton.Visibility = Visibility.Collapsed;
+                DoctorsButton.ToolTip = null;
+                _views.Remove("Doctors");
             }
         }
 
@@ -60,6 +61,19 @@ namespace HospitalNet.UI
         {
             if (sender is Button btn && btn.Tag is string tag)
             {
+                if (tag.Equals("Doctors", StringComparison.OrdinalIgnoreCase) &&
+                    App.CurrentUser != null &&
+                    !App.CurrentUser.IsAdmin)
+                {
+                    MessageBox.Show(
+                        this,
+                        "Doctors section is available for admin users only.",
+                        "Access denied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    return;
+                }
+
                 PageTitleTextBlock.Text = tag;
                 ShowView(tag);
             }
