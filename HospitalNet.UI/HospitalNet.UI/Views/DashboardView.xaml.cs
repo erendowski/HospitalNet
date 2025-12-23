@@ -156,24 +156,24 @@ namespace HospitalNet.UI.Views
                     }
 
                     // Patients by gender
-                    var genderGroups = patients
-                        .GroupBy(p => string.IsNullOrWhiteSpace(p.Gender) ? "Unspecified" : p.Gender.Trim())
-                        .Select(g => new { Label = g.Key, Count = g.Count() })
-                        .OrderByDescending(x => x.Count)
-                        .ToList();
+                    //var genderGroups = patients
+                    //    .GroupBy(p => string.IsNullOrWhiteSpace(p.Gender) ? "Unspecified" : p.Gender.Trim())
+                    //    .Select(g => new { Label = g.Key, Count = g.Count() })
+                    //    .OrderByDescending(x => x.Count)
+                    //    .ToList();
 
-                    int genderTotal = genderGroups.Sum(x => x.Count);
-                    PatientsByGenderItems.ItemsSource = genderGroups.Select(x => new DashboardBarItem
-                    {
-                        Label = x.Label,
-                        CountText = x.Count.ToString(),
-                        Fraction = genderTotal == 0 ? 0 : (double)x.Count / genderTotal
-                    }).ToList();
+                    //int genderTotal = genderGroups.Sum(x => x.Count);
+                    //PatientsByGenderItems.ItemsSource = genderGroups.Select(x => new DashboardBarItem
+                    //{
+                    //    Label = x.Label,
+                    //    CountText = x.Count.ToString(),
+                    //    Fraction = genderTotal == 0 ? 0 : (double)x.Count / genderTotal
+                    //}).ToList();
                 }
                 catch
                 {
                     TotalPatientsMetric.Text = "N/A";
-                    PatientsByGenderItems.ItemsSource = null;
+                    //PatientsByGenderItems.ItemsSource = null;
                 }
 
                 var displayAppointments = new ObservableCollection<AppointmentCardItem>();
@@ -256,7 +256,7 @@ namespace HospitalNet.UI.Views
             _appointmentManager = null;
 
             TodayAppointmentsItems.ItemsSource = null;
-            PatientsByGenderItems.ItemsSource = null;
+            //PatientsByGenderItems.ItemsSource = null;
             DoctorsBySpecializationItems.ItemsSource = null;
             AppointmentsByStatusItems.ItemsSource = null;
             TodayAppointmentsMetric.Text = "-";

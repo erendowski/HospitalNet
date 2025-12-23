@@ -6,6 +6,15 @@
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000"
              Background="{StaticResource BackgroundBrush}">
+    <UserControl.Resources>
+        <!-- Only apply to this ListBox via ItemContainerStyle -->
+        <Style x:Key="AppointmentsListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+    </UserControl.Resources>
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -52,7 +61,11 @@
 
                 <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="Appointments for Selected Doctor &amp; Date" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
 
-                <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                <Border Grid.Row="1" Grid.Column="0"
+Background="{StaticResource BackgroundBrush}"
+BorderBrush="{StaticResource BorderBrush}"
+BorderThickness="1" CornerRadius="4" Padding="10">
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -67,27 +80,31 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="120"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Grid.Column="0" Text="Time"   FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <TextBlock Grid.Column="1" Text="Patient" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <TextBlock Grid.Column="2" Text="Reason" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <TextBlock Grid.Column="3" Text="Status" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                         </Grid>
 
+                        <!-- Items -->
                         <ListBox Grid.Row="1"
-                                 x:Name="AppointmentsListBox"
-                                 SelectionChanged="AppointmentsListBox_SelectionChanged"
-                                 BorderThickness="0"
-                                 Background="Transparent"
-                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+         x:Name="AppointmentsListBox"
+         ItemContainerStyle="{StaticResource AppointmentsListBoxItemStyle}"
+         SelectionChanged="AppointmentsListBox_SelectionChanged"
+         BorderThickness="0"
+         Background="Transparent"
+         ScrollViewer.VerticalScrollBarVisibility="Auto">
+
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="{StaticResource SurfaceBrush}"
-                                            BorderBrush="{StaticResource BorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="4"
-                                            Padding="10"
-                                            Margin="0,0,0,8">
+                    BorderBrush="{StaticResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="10"
+                    Margin="0,0,0,8">
                                         <Grid>
+                                            <!-- MATCH HEADER EXACTLY (fixes last column alignment) -->
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="80"/>
                                                 <ColumnDefinition Width="200"/>
@@ -95,14 +112,33 @@
                                                 <ColumnDefinition Width="120"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <TextBlock Grid.Column="0" Text="{Binding AppointmentTime, StringFormat={}{0:HH:mm}}" Foreground="{StaticResource TextPrimaryBrush}" />
-                                            <TextBlock Grid.Column="1" Text="{Binding PatientName}" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Column="2" Text="{Binding ReasonForVisit}" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Column="3" Text="{Binding Status}" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="0"
+                               Text="{Binding AppointmentTime, StringFormat={}{0:HH:mm}}"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"/>
+
+                                            <TextBlock Grid.Column="1"
+                               Text="{Binding PatientName}"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"/>
+
+                                            <TextBlock Grid.Column="2"
+                               Text="{Binding ReasonForVisit}"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"/>
+
+                                            <TextBlock Grid.Column="3"
+                               Text="{Binding Status}"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+
                         </ListBox>
                     </Grid>
                 </Border>

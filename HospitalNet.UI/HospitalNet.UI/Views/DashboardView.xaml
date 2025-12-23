@@ -70,32 +70,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="16">
-                <StackPanel>
-                    <TextBlock Text="Patients by Gender" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
-                    <ItemsControl x:Name="PatientsByGenderItems">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" Foreground="{StaticResource TextPrimaryBrush}" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CountText}" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
-                                    <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="10" Maximum="1" Value="{Binding Fraction}" Margin="0,6,0,0"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
-            </Border>
 
-            <Border Grid.Row="0" Grid.Column="2" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="16">
+            <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="16">
                 <StackPanel>
                     <TextBlock Text="Doctors by Specialization" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
                     <ItemsControl x:Name="DoctorsBySpecializationItems">
