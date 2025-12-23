@@ -478,26 +478,25 @@ namespace HospitalNet.UI.Views
                 }
 
                 var result = MessageBox.Show(
-                    $"Are you sure you want to deactivate Dr. {_selectedDoctor.FullName}?\n\nThis will set the doctor as inactive but keep their records.",
-                    "Confirm Deactivation",
+                    $"Delete Dr. {_selectedDoctor.FullName} permanently?\n\nThis also deletes the doctor's appointments and medical records.",
+                    "Confirm Deletion",
                     MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                    MessageBoxImage.Warning);
 
                 if (result != MessageBoxResult.Yes)
                     return;
 
-                _selectedDoctor.IsActive = false;
-                _doctorManager.UpdateDoctor(_selectedDoctor);
+                _doctorManager.DeleteDoctor(_selectedDoctor.DoctorID);
                 LoadDoctors();
                 ClearDoctorDetails();
                 _selectedDoctor = null;
                 UpdateDoctorActionButtons();
-                StatusTextBlock.Text = "Doctor deactivated";
+                StatusTextBlock.Text = "Doctor deleted";
             }
             catch (Exception ex)
             {
                 StatusTextBlock.Text = $"Error: {ex.Message}";
-                MessageBox.Show($"Failed to deactivate doctor:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Failed to delete doctor:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -566,24 +565,23 @@ namespace HospitalNet.UI.Views
                 }
 
                 var result = MessageBox.Show(
-                    $"Are you sure you want to deactivate Dr. {doctor.FullName}?\n\nThis will set the doctor as inactive but keep their records.",
-                    "Confirm Deactivation",
+                    $"Delete Dr. {doctor.FullName} permanently?\n\nThis also deletes the doctor's appointments and medical records.",
+                    "Confirm Deletion",
                     MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+                    MessageBoxImage.Warning);
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    doctor.IsActive = false;
-                    _doctorManager.UpdateDoctor(doctor);
+                    _doctorManager.DeleteDoctor(doctor.DoctorID);
                     LoadDoctors();
                     ClearDoctorDetails();
-                    StatusTextBlock.Text = $"Doctor {doctor.FullName} deactivated";
+                    StatusTextBlock.Text = $"Doctor {doctor.FullName} deleted";
                 }
             }
             catch (Exception ex)
             {
                 StatusTextBlock.Text = $"Error: {ex.Message}";
-                MessageBox.Show($"Failed to deactivate doctor:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Failed to delete doctor:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

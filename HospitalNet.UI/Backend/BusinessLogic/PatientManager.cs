@@ -13,6 +13,7 @@ namespace HospitalNet.Backend.BusinessLogic
     /// </summary>
     public class PatientManager
     {
+        private readonly string _connectionString;
         private readonly DatabaseHelper _dbHelper;
 
         /// <summary>
@@ -21,6 +22,7 @@ namespace HospitalNet.Backend.BusinessLogic
         /// <param name="connectionString">The database connection string.</param>
         public PatientManager(string connectionString)
         {
+            _connectionString = connectionString;
             _dbHelper = new DatabaseHelper(connectionString);
         }
 
@@ -460,7 +462,23 @@ namespace HospitalNet.Backend.BusinessLogic
                 };
 
                 int rowsAffected = _dbHelper.ExecuteNonQuery("sp_SetPatientActiveStatus", parameters);
-                return rowsAffected > 0;
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                var current = GetPatientById(patientId);
+                if (current == null)
+                {
+                    throw new Exception($"Deactivation failed: patient not found (ID: {patientId}).");
+                }
+
+                if (!current.IsActive)
+                {
+                    return true;
+                }
+
+                throw new Exception("Deactivation failed: no rows affected. Verify dbo.sp_SetPatientActiveStatus updates the record and that the login has EXECUTE permission.");
             }
             catch (SqlException sqlEx)
             {
@@ -469,6 +487,85 @@ namespace HospitalNet.Backend.BusinessLogic
             catch (Exception ex)
             {
                 throw new Exception($"Error deactivating patient: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Permanently deletes a patient record and dependent rows (appointments, medical records).
+        /// Calls sp_DeletePatient stored procedure.
+        /// </summary>
+        public bool DeletePatient(int patientId)
+        {
+            try
+            {
+                if (patientId <= 0)
+                {
+                    throw new ArgumentException("Patient ID must be greater than 0.", nameof(patientId));
+                }
+
+                var parameters = new[]
+                {
+                    DatabaseHelper.CreateInputParameter("@PatientId", patientId)
+                };
+
+                int rowsAffected = _dbHelper.ExecuteNonQuery("dbo.sp_DeletePatient", parameters);
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                var current = GetPatientById(patientId);
+                if (current == null)
+                {
+                    return true;
+                }
+
+                throw new Exception("Deletion failed: no rows affected. Verify dbo.sp_DeletePatient deletes the record and that the login has EXECUTE permission.");
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Message != null &&
+                    sqlEx.Message.IndexOf("Could not find stored procedure", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    string connectionHint;
+                    try
+                    {
+                        var builder = new SqlConnectionStringBuilder(_connectionString);
+                        string databaseName = builder.InitialCatalog;
+
+                        using (var con = new SqlConnection(_connectionString))
+                        {
+                            con.Open();
+                            using var cmd = con.CreateCommand();
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = "SELECT DB_NAME()";
+                            var currentDb = cmd.ExecuteScalar() as string;
+                            if (!string.IsNullOrWhiteSpace(currentDb))
+                            {
+                                databaseName = currentDb;
+                            }
+                        }
+
+                        connectionHint = $"Server: {builder.DataSource}\nDatabase: {databaseName}";
+                    }
+                    catch
+                    {
+                        connectionHint = "Server/Database: (unable to determine)";
+                    }
+
+                    throw new Exception(
+                        $"Database error while deleting patient: {sqlEx.Message}\n\n" +
+                        "The database you're connected to does not have dbo.sp_DeletePatient yet.\n" +
+                        $"{connectionHint}\n\n" +
+                        "Fix: run the SQL script `Database/10_Add_DeletePatient_Proc.sql` against THAT database.",
+                        sqlEx);
+                }
+
+                throw new Exception($"Database error while deleting patient: {sqlEx.Message}", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting patient: {ex.Message}", ex);
             }
         }
     }

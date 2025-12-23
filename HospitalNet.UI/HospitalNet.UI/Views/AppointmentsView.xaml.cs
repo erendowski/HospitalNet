@@ -90,8 +90,8 @@ namespace HospitalNet.UI.Views
 
             if (CompleteAppointmentButton != null)
                 CompleteAppointmentButton.IsEnabled = canAct;
-            if (CancelAppointmentButton != null)
-                CancelAppointmentButton.IsEnabled = canAct;
+            if (DeleteAppointmentButton != null)
+                DeleteAppointmentButton.IsEnabled = canAct;
         }
 
         private void InitializeManagers()
@@ -322,7 +322,7 @@ namespace HospitalNet.UI.Views
             }
         }
 
-        private void CancelAppointmentButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteAppointmentButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -339,22 +339,22 @@ namespace HospitalNet.UI.Views
                 }
 
                 var result = MessageBox.Show(
-                    $"Cancel appointment #{_selectedAppointmentRow.AppointmentID}?",
-                    "Confirm Cancellation",
+                    $"Delete appointment #{_selectedAppointmentRow.AppointmentID} permanently?\n\nThis cannot be undone.",
+                    "Confirm Deletion",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Warning);
 
                 if (result != MessageBoxResult.Yes)
                     return;
 
-                _appointmentManager.CancelAppointment(_selectedAppointmentRow.AppointmentID, "Cancelled");
+                _appointmentManager.DeleteAppointment(_selectedAppointmentRow.AppointmentID);
 
                 RefreshAppointmentsList();
                 SetSelectedAppointmentRow(null);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to cancel appointment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Failed to delete appointment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

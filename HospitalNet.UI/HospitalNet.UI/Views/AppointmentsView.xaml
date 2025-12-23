@@ -140,10 +140,10 @@
                                     <TextBlock Text="Complete"/>
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="CancelAppointmentButton" Width="120" Height="32" Margin="10,0,0,0" Style="{StaticResource SecondaryButtonStyle}" Click="CancelAppointmentButton_Click" IsEnabled="False">
+                            <Button x:Name="DeleteAppointmentButton" Width="120" Height="32" Margin="10,0,0,0" Style="{StaticResource DangerButtonStyle}" Click="DeleteAppointmentButton_Click" IsEnabled="False">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Cancel"/>
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Delete"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>

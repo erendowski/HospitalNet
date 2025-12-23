@@ -110,10 +110,10 @@
                                     <TextBlock Text="Edit"/>
                                 </StackPanel>
                             </Button>
-                            <Button x:Name="DeactivateSelectedDoctorButton" Width="120" Height="32" Margin="10,0,0,0" Style="{StaticResource SecondaryButtonStyle}" Click="DeactivateSelectedDoctorButton_Click" IsEnabled="False">
+                            <Button x:Name="DeactivateSelectedDoctorButton" Width="120" Height="32" Margin="10,0,0,0" Style="{StaticResource DangerButtonStyle}" Click="DeactivateSelectedDoctorButton_Click" IsEnabled="False">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
-                                    <TextBlock Text="Deactivate"/>
+                                    <TextBlock Text="Delete"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>

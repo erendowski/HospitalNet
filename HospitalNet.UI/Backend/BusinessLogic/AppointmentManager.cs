@@ -217,6 +217,90 @@ namespace HospitalNet.Backend.BusinessLogic
         }
 
         /// <summary>
+        /// Deletes an appointment permanently.
+        /// Calls sp_DeleteAppointment stored procedure.
+        /// </summary>
+        /// <param name="appointmentId">The ID of the appointment to delete.</param>
+        /// <returns>True if deletion was successful; false otherwise.</returns>
+        public bool DeleteAppointment(int appointmentId)
+        {
+            try
+            {
+                if (appointmentId <= 0)
+                {
+                    throw new ArgumentException("Appointment ID must be greater than 0.", nameof(appointmentId));
+                }
+
+                var parameters = new[]
+                {
+                    DatabaseHelper.CreateInputParameter("@AppointmentId", appointmentId)
+                };
+
+                int rowsAffected = _dbHelper.ExecuteNonQuery("dbo.sp_DeleteAppointment", parameters);
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                var current = GetAppointmentById(appointmentId);
+                if (current == null)
+                {
+                    // Treat "already deleted" as success.
+                    return true;
+                }
+
+                throw new Exception($"Deletion failed: no rows affected. Current status: '{current.Status}'. Verify dbo.sp_DeleteAppointment deletes the record and that the login has EXECUTE permission.");
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Message != null &&
+                    sqlEx.Message.IndexOf("Could not find stored procedure", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    string connectionHint;
+                    try
+                    {
+                        var builder = new SqlConnectionStringBuilder(_connectionString);
+                        string databaseName = builder.InitialCatalog;
+
+                        // Confirm the actual DB we're connected to (guards against misconfigured catalog).
+                        using (var con = new SqlConnection(_connectionString))
+                        {
+                            con.Open();
+                            using var cmd = con.CreateCommand();
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = "SELECT DB_NAME()";
+                            var currentDb = cmd.ExecuteScalar() as string;
+                            if (!string.IsNullOrWhiteSpace(currentDb))
+                            {
+                                databaseName = currentDb;
+                            }
+                        }
+
+                        connectionHint = $"Server: {builder.DataSource}\nDatabase: {databaseName}";
+                    }
+                    catch
+                    {
+                        connectionHint = "Server/Database: (unable to determine)";
+                    }
+
+                    throw new Exception(
+                        $"Database error while deleting appointment: {sqlEx.Message}\n\n" +
+                        "The database you're connected to does not have dbo.sp_DeleteAppointment yet.\n" +
+                        $"{connectionHint}\n\n" +
+                        "Fix: run the SQL script `Database/08_Add_DeleteAppointment_Proc.sql` against THAT database.\n" +
+                        "If you get permission errors running the script, execute it as a dbo/db_owner user (or ask your DBA).",
+                        sqlEx);
+                }
+
+                throw new Exception($"Database error while deleting appointment: {sqlEx.Message}", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting appointment: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Checks if a doctor is available for a specific time slot.
         /// Calls sp_CheckDoctorAvailability stored procedure.
         /// </summary>
@@ -403,7 +487,8 @@ namespace HospitalNet.Backend.BusinessLogic
                 int rowsAffected = _dbHelper.ExecuteNonQuery("sp_CompleteAppointment", parameters);
                 if (rowsAffected > 0)
                 {
-                    return true;
+                    // User requirement: completing an appointment should also remove it from the system.
+                    return DeleteAppointment(appointmentId);
                 }
 
                 var current = GetAppointmentById(appointmentId);
@@ -414,7 +499,7 @@ namespace HospitalNet.Backend.BusinessLogic
 
                 if (string.Equals(current.Status, "Completed", StringComparison.OrdinalIgnoreCase))
                 {
-                    return true;
+                    return DeleteAppointment(appointmentId);
                 }
 
                 throw new Exception($"Completion failed: no rows affected. Current status: '{current.Status}'. Verify dbo.sp_CompleteAppointment updates the record and that the login has EXECUTE permission.");

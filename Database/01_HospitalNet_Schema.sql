@@ -200,6 +200,19 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE dbo.sp_DeletePatient
+    @PatientId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Hard delete: remove dependent rows first (no ON DELETE CASCADE in schema).
+    DELETE FROM dbo.MedicalRecords WHERE PatientID = @PatientId;
+    DELETE FROM dbo.Appointments WHERE PatientID = @PatientId;
+    DELETE FROM dbo.Patients WHERE PatientID = @PatientId;
+END
+GO
+
 /* Doctors */
 CREATE OR ALTER PROCEDURE dbo.sp_CreateDoctor
     @FirstName NVARCHAR(100),
@@ -277,6 +290,32 @@ BEGIN
         OfficeLocation=@OfficeLocation, YearsOfExperience=@YearsOfExperience,
         MaxPatientCapacityPerDay=@MaxPatientCapacityPerDay, Salary=@Salary, IsActive=@IsActive, UpdatedDate=sysdatetime()
     WHERE DoctorID=@DoctorId;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.sp_SetDoctorActiveStatus
+    @DoctorId INT,
+    @IsActive BIT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    UPDATE dbo.Doctors
+    SET IsActive=@IsActive,
+        UpdatedDate=sysdatetime()
+    WHERE DoctorID=@DoctorId;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.sp_DeleteDoctor
+    @DoctorId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Hard delete: remove dependent rows first (no ON DELETE CASCADE in schema).
+    DELETE FROM dbo.MedicalRecords WHERE DoctorID = @DoctorId;
+    DELETE FROM dbo.Appointments WHERE DoctorID = @DoctorId;
+    DELETE FROM dbo.Doctors WHERE DoctorID = @DoctorId;
 END
 GO
 
@@ -393,6 +432,23 @@ BEGIN
     UPDATE dbo.Appointments
     SET Status=@Status, Notes=@Notes, CompletedAt=sysdatetime(), UpdatedDate=sysdatetime()
     WHERE AppointmentID=@AppointmentId;
+END
+GO
+
+CREATE OR ALTER PROCEDURE dbo.sp_DeleteAppointment
+    @AppointmentId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Preserve medical records by removing the (nullable) appointment link.
+    UPDATE dbo.MedicalRecords
+    SET AppointmentID = NULL,
+        UpdatedDate = sysdatetime()
+    WHERE AppointmentID = @AppointmentId;
+
+    DELETE FROM dbo.Appointments
+    WHERE AppointmentID = @AppointmentId;
 END
 GO
 

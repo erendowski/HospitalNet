@@ -13,6 +13,7 @@ namespace HospitalNet.Backend.BusinessLogic
     /// </summary>
     public class DoctorManager
     {
+        private readonly string _connectionString;
         private readonly DatabaseHelper _dbHelper;
 
         /// <summary>
@@ -21,6 +22,7 @@ namespace HospitalNet.Backend.BusinessLogic
         /// <param name="connectionString">The database connection string.</param>
         public DoctorManager(string connectionString)
         {
+            _connectionString = connectionString;
             _dbHelper = new DatabaseHelper(connectionString);
         }
 
@@ -323,6 +325,171 @@ namespace HospitalNet.Backend.BusinessLogic
             catch (Exception ex)
             {
                 throw new Exception($"Error updating doctor: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deactivates (soft deletes) a doctor record.
+        /// </summary>
+        /// <param name="doctorId">The ID of the doctor to deactivate.</param>
+        /// <returns>True if deactivation was successful; false otherwise.</returns>
+        public bool DeactivateDoctor(int doctorId)
+        {
+            try
+            {
+                if (doctorId <= 0)
+                {
+                    throw new ArgumentException("Doctor ID must be greater than 0.", nameof(doctorId));
+                }
+
+                var parameters = new[]
+                {
+                    DatabaseHelper.CreateInputParameter("@DoctorId", doctorId),
+                    DatabaseHelper.CreateInputParameter("@IsActive", false)
+                };
+
+                int rowsAffected = _dbHelper.ExecuteNonQuery("dbo.sp_SetDoctorActiveStatus", parameters);
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                var current = GetDoctorById(doctorId);
+                if (current == null)
+                {
+                    throw new Exception($"Deactivation failed: doctor not found (ID: {doctorId}).");
+                }
+
+                if (!current.IsActive)
+                {
+                    return true;
+                }
+
+                throw new Exception("Deactivation failed: no rows affected. Verify dbo.sp_SetDoctorActiveStatus updates the record and that the login has EXECUTE permission.");
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Message != null &&
+                    sqlEx.Message.IndexOf("Could not find stored procedure", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    string connectionHint;
+                    try
+                    {
+                        var builder = new SqlConnectionStringBuilder(_connectionString);
+                        string databaseName = builder.InitialCatalog;
+
+                        using (var con = new SqlConnection(_connectionString))
+                        {
+                            con.Open();
+                            using var cmd = con.CreateCommand();
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = "SELECT DB_NAME()";
+                            var currentDb = cmd.ExecuteScalar() as string;
+                            if (!string.IsNullOrWhiteSpace(currentDb))
+                            {
+                                databaseName = currentDb;
+                            }
+                        }
+
+                        connectionHint = $"Server: {builder.DataSource}\nDatabase: {databaseName}";
+                    }
+                    catch
+                    {
+                        connectionHint = "Server/Database: (unable to determine)";
+                    }
+
+                    throw new Exception(
+                        $"Database error while deactivating doctor: {sqlEx.Message}\n\n" +
+                        "The database you're connected to does not have dbo.sp_SetDoctorActiveStatus yet.\n" +
+                        $"{connectionHint}\n\n" +
+                        "Fix: run the SQL script `Database/09_Add_SetDoctorActiveStatus_Proc.sql` against THAT database.",
+                        sqlEx);
+                }
+
+                throw new Exception($"Database error while deactivating doctor: {sqlEx.Message}", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deactivating doctor: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Permanently deletes a doctor record and dependent rows (appointments, medical records).
+        /// Calls sp_DeleteDoctor stored procedure.
+        /// </summary>
+        public bool DeleteDoctor(int doctorId)
+        {
+            try
+            {
+                if (doctorId <= 0)
+                {
+                    throw new ArgumentException("Doctor ID must be greater than 0.", nameof(doctorId));
+                }
+
+                var parameters = new[]
+                {
+                    DatabaseHelper.CreateInputParameter("@DoctorId", doctorId)
+                };
+
+                int rowsAffected = _dbHelper.ExecuteNonQuery("dbo.sp_DeleteDoctor", parameters);
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                var current = GetDoctorById(doctorId);
+                if (current == null)
+                {
+                    return true;
+                }
+
+                throw new Exception("Deletion failed: no rows affected. Verify dbo.sp_DeleteDoctor deletes the record and that the login has EXECUTE permission.");
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Message != null &&
+                    sqlEx.Message.IndexOf("Could not find stored procedure", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    string connectionHint;
+                    try
+                    {
+                        var builder = new SqlConnectionStringBuilder(_connectionString);
+                        string databaseName = builder.InitialCatalog;
+
+                        using (var con = new SqlConnection(_connectionString))
+                        {
+                            con.Open();
+                            using var cmd = con.CreateCommand();
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = "SELECT DB_NAME()";
+                            var currentDb = cmd.ExecuteScalar() as string;
+                            if (!string.IsNullOrWhiteSpace(currentDb))
+                            {
+                                databaseName = currentDb;
+                            }
+                        }
+
+                        connectionHint = $"Server: {builder.DataSource}\nDatabase: {databaseName}";
+                    }
+                    catch
+                    {
+                        connectionHint = "Server/Database: (unable to determine)";
+                    }
+
+                    throw new Exception(
+                        $"Database error while deleting doctor: {sqlEx.Message}\n\n" +
+                        "The database you're connected to does not have dbo.sp_DeleteDoctor yet.\n" +
+                        $"{connectionHint}\n\n" +
+                        "Fix: run the SQL script `Database/11_Add_DeleteDoctor_Proc.sql` against THAT database.",
+                        sqlEx);
+                }
+
+                throw new Exception($"Database error while deleting doctor: {sqlEx.Message}", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting doctor: {ex.Message}", ex);
             }
         }
 
