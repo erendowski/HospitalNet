@@ -5,3 +5,5 @@
 # Visual Studio caches
 .vs/
 HospitalNet.UI/.vs/
+
+HospitalNet.UI/App.secrets.config
