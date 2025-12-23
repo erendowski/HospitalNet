@@ -197,16 +197,25 @@ END;
 --    NOTE: This assumes stored procedures are in dbo schema.
 --------------------------------------------
 
+	-- Admin role: all 3
 -- Admin role: all 3
-GRANT EXECUTE ON OBJECT::dbo.sp_CreateDoctor      TO [HospitalAdminRole];
-GRANT EXECUTE ON OBJECT::dbo.sp_CreatePatient     TO [HospitalAdminRole];
-GRANT EXECUTE ON OBJECT::dbo.sp_CreateAppointment TO [HospitalAdminRole];
-
+GRANT EXECUTE ON OBJECT::dbo.sp_CreateDoctor      TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CreatePatient     TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CreateAppointment TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorByLicenseNumber TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAllActiveDoctors TO HospitalAdminRole;
+GRANT ALTER ON OBJECT::dbo.sp_CreateDoctor      TO HospitalAdminRole;
+GRANT ALTER ON OBJECT::dbo.sp_CreatePatient     TO HospitalAdminRole;
+GRANT ALTER ON OBJECT::dbo.sp_CreateAppointment TO HospitalAdminRole;
+GRANT ALTER ON OBJECT::dbo.sp_GetDoctorByLicenseNumber TO HospitalAdminRole;
+GRANT ALTER ON OBJECT::dbo.sp_GetAllActiveDoctors TO HospitalAdminRole;
+GO
 -- Normal role: only patient + appointment
-GRANT EXECUTE ON OBJECT::dbo.sp_CreatePatient     TO [HospitalUserRole];
-GRANT EXECUTE ON OBJECT::dbo.sp_CreateAppointment TO [HospitalUserRole];
-
--- Optional hardening (uncomment if you want an explicit block even if someone later grants via another path):
--- DENY EXECUTE ON OBJECT::dbo.sp_CreateDoctor TO [HospitalUserRole];
+GRANT EXECUTE ON OBJECT::dbo.sp_CreatePatient     TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CreateAppointment TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorByLicenseNumber TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAllActiveDoctors TO HospitalUserRole;
+DENY  EXECUTE ON OBJECT::dbo.sp_CreateDoctor      TO HospitalUserRole;
+GO
 
 PRINT 'Done. Logins/users/roles/permissions have been applied.';

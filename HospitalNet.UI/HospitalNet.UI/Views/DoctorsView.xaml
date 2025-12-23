@@ -70,7 +70,8 @@
 
                     <DataGrid Grid.Row="1" x:Name="DoctorsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="40" ColumnHeaderHeight="40" SelectionChanged="DoctorsDataGrid_SelectionChanged">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Binding="{Binding FullName}" Width="150" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGridTextColumn Header="First" Binding="{Binding FirstName}" Width="100"/>
+                            <DataGridTextColumn Header="Last"  Binding="{Binding LastName}"  Width="100"/>
                             <DataGridTextColumn Header="Specialization" Binding="{Binding Specialization}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <DataGridTextColumn Header="License" Binding="{Binding LicenseNumber}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>

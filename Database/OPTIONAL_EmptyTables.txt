@@ -1,0 +1,15 @@
+USE HospitalNet;
+GO
+
+-- Close FK constraints
+EXEC sp_msforeachtable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';
+GO
+
+DELETE FROM dbo.Appointments;
+DELETE FROM dbo.Patients;
+DELETE FROM dbo.Doctors;
+GO
+
+-- Reopen FK constraints
+EXEC sp_msforeachtable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL';
+GO

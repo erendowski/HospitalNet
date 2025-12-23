@@ -113,11 +113,11 @@ namespace HospitalNet.UI.Views
             else
             {
                 var filtered = _allDoctors.Where(d =>
-                    d.FullName.ToLower().Contains(searchTerm) ||
-                    d.Specialization.ToLower().Contains(searchTerm) ||
-                    d.LicenseNumber.ToLower().Contains(searchTerm) ||
-                    d.Email.ToLower().Contains(searchTerm)).ToList();
-                DoctorsDataGrid.ItemsSource = new ObservableCollection<Doctor>(filtered);
+       (($"{d.FirstName} {d.LastName}").ToLower().Contains(searchTerm)) ||
+       ((d.Specialization ?? "").ToLower().Contains(searchTerm)) ||
+       ((d.LicenseNumber ?? "").ToLower().Contains(searchTerm)) ||
+       ((d.Email ?? "").ToLower().Contains(searchTerm))
+   ).ToList();
             }
         }
 

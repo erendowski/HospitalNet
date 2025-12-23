@@ -56,6 +56,7 @@ namespace HospitalNet.Backend.BusinessLogic
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate")
                     });
 
+                System.Diagnostics.Debug.WriteLine($"[DoctorManager] sp_GetAllDoctors returned {doctors.Count} rows");
                 return doctors;
             }
             catch (SqlException sqlEx)
