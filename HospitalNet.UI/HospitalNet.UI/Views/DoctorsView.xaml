@@ -95,7 +95,29 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="Doctor Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="15,15,15,10"/>
+                    <Grid Grid.Row="0" Margin="15,15,15,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="Doctor Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="EditSelectedDoctorButton" Width="90" Height="32" Style="{StaticResource SecondaryButtonStyle}" Click="EditSelectedDoctorButton_Click" IsEnabled="False">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Edit"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="DeactivateSelectedDoctorButton" Width="120" Height="32" Margin="10,0,0,0" Style="{StaticResource SecondaryButtonStyle}" Click="DeactivateSelectedDoctorButton_Click" IsEnabled="False">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Deactivate"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
 
                     <!-- Add Doctor Screen (inline) -->
                     <Border Grid.Row="1" x:Name="AddDoctorPanel" Visibility="Collapsed" Margin="15,0,15,15" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12">

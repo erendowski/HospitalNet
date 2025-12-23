@@ -72,11 +72,26 @@ namespace HospitalNet.UI.Views
             if (row == null)
             {
                 SelectedAppointmentText.Text = "-";
+                UpdateAppointmentActionButtons();
                 return;
             }
 
             SelectedAppointmentText.Text =
                 $"#{row.AppointmentID} | {row.AppointmentTime:g} | {row.Status}\n{row.PatientName}\n{row.ReasonForVisit}";
+            UpdateAppointmentActionButtons();
+        }
+
+        private void UpdateAppointmentActionButtons()
+        {
+            bool canAct = _selectedAppointmentRow != null &&
+                          !string.Equals(_selectedAppointmentRow.Status, "Completed", StringComparison.OrdinalIgnoreCase) &&
+                          !string.Equals(_selectedAppointmentRow.Status, "Cancelled", StringComparison.OrdinalIgnoreCase) &&
+                          _appointmentManager != null;
+
+            if (CompleteAppointmentButton != null)
+                CompleteAppointmentButton.IsEnabled = canAct;
+            if (CancelAppointmentButton != null)
+                CancelAppointmentButton.IsEnabled = canAct;
         }
 
         private void InitializeManagers()
@@ -197,6 +212,7 @@ namespace HospitalNet.UI.Views
                 if (_appointmentManager == null || _patientManager == null)
                 {
                     AppointmentsListBox.ItemsSource = null;
+                    UpdateAppointmentActionButtons();
                     return;
                 }
 
@@ -234,10 +250,12 @@ namespace HospitalNet.UI.Views
                 }
 
                 AppointmentsListBox.ItemsSource = displayAppointments;
+                UpdateAppointmentActionButtons();
             }
             catch
             {
                 AppointmentsListBox.ItemsSource = null;
+                UpdateAppointmentActionButtons();
             }
         }
 
@@ -266,6 +284,78 @@ namespace HospitalNet.UI.Views
             }
 
             SetSelectedAppointmentRow(null);
+        }
+
+        private void CompleteAppointmentButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_appointmentManager == null)
+                {
+                    MessageBox.Show("Appointments are unavailable (offline or no database connection).", "Offline", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_selectedAppointmentRow == null)
+                {
+                    MessageBox.Show("Please select an appointment.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                var result = MessageBox.Show(
+                    $"Mark appointment #{_selectedAppointmentRow.AppointmentID} as completed?",
+                    "Confirm Completion",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+
+                _appointmentManager.CompleteAppointment(_selectedAppointmentRow.AppointmentID);
+
+                RefreshAppointmentsList();
+                SetSelectedAppointmentRow(null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to complete appointment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void CancelAppointmentButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_appointmentManager == null)
+                {
+                    MessageBox.Show("Appointments are unavailable (offline or no database connection).", "Offline", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_selectedAppointmentRow == null)
+                {
+                    MessageBox.Show("Please select an appointment.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                var result = MessageBox.Show(
+                    $"Cancel appointment #{_selectedAppointmentRow.AppointmentID}?",
+                    "Confirm Cancellation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Warning);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+
+                _appointmentManager.CancelAppointment(_selectedAppointmentRow.AppointmentID, "Cancelled");
+
+                RefreshAppointmentsList();
+                SetSelectedAppointmentRow(null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to cancel appointment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BookButton_Click(object sender, RoutedEventArgs e)

@@ -179,11 +179,18 @@ namespace HospitalNet.UI.Views
 
         private void ApplyAuthorization()
         {
+            bool isAdmin = App.CurrentUser != null && App.CurrentUser.IsAdmin;
+
             if (AddDoctorButton != null)
             {
-                AddDoctorButton.IsEnabled = true;
-                AddDoctorButton.ToolTip = "Add Doctor";
+                AddDoctorButton.IsEnabled = isAdmin;
+                AddDoctorButton.ToolTip = isAdmin ? "Add Doctor" : "Admin required";
             }
+
+            if (EditSelectedDoctorButton != null)
+                EditSelectedDoctorButton.IsEnabled = false;
+            if (DeactivateSelectedDoctorButton != null)
+                DeactivateSelectedDoctorButton.IsEnabled = false;
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -203,11 +210,25 @@ namespace HospitalNet.UI.Views
                 UpdateDoctorDetails(doctor);
                 LoadAppointmentsForDoctor(doctor.DoctorID);
                 SetSelectedAppointmentRow(null);
+                UpdateDoctorActionButtons();
                 return;
             }
 
             _selectedDoctor = null;
             ClearDoctorDetails();
+            UpdateDoctorActionButtons();
+        }
+
+        private void UpdateDoctorActionButtons()
+        {
+            bool isAdmin = App.CurrentUser != null && App.CurrentUser.IsAdmin;
+            bool hasDoctor = _selectedDoctor != null;
+            bool hasDb = _doctorManager != null && !App.OfflineMode;
+
+            if (EditSelectedDoctorButton != null)
+                EditSelectedDoctorButton.IsEnabled = isAdmin && hasDoctor && hasDb;
+            if (DeactivateSelectedDoctorButton != null)
+                DeactivateSelectedDoctorButton.IsEnabled = isAdmin && hasDoctor && hasDb;
         }
 
         private void UpdateDoctorDetails(Doctor doctor)
@@ -388,6 +409,95 @@ namespace HospitalNet.UI.Views
                     "Error",
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
+            }
+        }
+
+        private void EditSelectedDoctorButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (App.CurrentUser != null && !App.CurrentUser.IsAdmin)
+                {
+                    MessageBox.Show(
+                        "You do not have permission to edit doctors.",
+                        "Permission Denied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_selectedDoctor == null)
+                {
+                    MessageBox.Show("Please select a doctor.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                int selectedId = _selectedDoctor.DoctorID;
+                var dialog = new AddDoctorDialog(_selectedDoctor);
+                dialog.Owner = Window.GetWindow(this);
+                bool? result = dialog.ShowDialog();
+
+                if (result == true)
+                {
+                    LoadDoctors();
+                    DoctorsDataGrid.SelectedItem = _allDoctors?.FirstOrDefault(d => d.DoctorID == selectedId);
+                    StatusTextBlock.Text = "Doctor updated successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusTextBlock.Text = $"Error: {ex.Message}";
+                MessageBox.Show($"Failed to update doctor:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void DeactivateSelectedDoctorButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (App.CurrentUser != null && !App.CurrentUser.IsAdmin)
+                {
+                    MessageBox.Show(
+                        "You do not have permission to deactivate doctors.",
+                        "Permission Denied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_doctorManager == null)
+                {
+                    MessageBox.Show("Doctors are unavailable (offline or no database connection).", "Offline", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_selectedDoctor == null)
+                {
+                    MessageBox.Show("Please select a doctor.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                var result = MessageBox.Show(
+                    $"Are you sure you want to deactivate Dr. {_selectedDoctor.FullName}?\n\nThis will set the doctor as inactive but keep their records.",
+                    "Confirm Deactivation",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result != MessageBoxResult.Yes)
+                    return;
+
+                _selectedDoctor.IsActive = false;
+                _doctorManager.UpdateDoctor(_selectedDoctor);
+                LoadDoctors();
+                ClearDoctorDetails();
+                _selectedDoctor = null;
+                UpdateDoctorActionButtons();
+                StatusTextBlock.Text = "Doctor deactivated";
+            }
+            catch (Exception ex)
+            {
+                StatusTextBlock.Text = $"Error: {ex.Message}";
+                MessageBox.Show($"Failed to deactivate doctor:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

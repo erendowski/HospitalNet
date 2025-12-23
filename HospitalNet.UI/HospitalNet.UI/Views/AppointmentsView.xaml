@@ -132,6 +132,21 @@
                                 <TextBlock x:Name="SelectedAppointmentText" Text="-" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+                            <Button x:Name="CompleteAppointmentButton" Width="120" Height="32" Style="{StaticResource PrimaryButtonStyle}" Click="CompleteAppointmentButton_Click" IsEnabled="False">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE930;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Complete"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="CancelAppointmentButton" Width="120" Height="32" Margin="10,0,0,0" Style="{StaticResource SecondaryButtonStyle}" Click="CancelAppointmentButton_Click" IsEnabled="False">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE711;" FontFamily="Segoe MDL2 Assets" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Cancel"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </Grid>

@@ -175,24 +175,36 @@ namespace HospitalNet.Backend.BusinessLogic
                     throw new ArgumentException("Appointment ID must be greater than 0.", nameof(appointmentId));
                 }
 
-                if (string.IsNullOrWhiteSpace(cancellationReason))
-                {
-                    throw new ArgumentException("Cancellation reason must be provided.", nameof(cancellationReason));
-                }
+                cancellationReason = string.IsNullOrWhiteSpace(cancellationReason) ? "Cancelled" : cancellationReason.Trim();
 
                 // Create parameters for stored procedure
                 var parameters = new[]
                 {
-                    DatabaseHelper.CreateInputParameter("@AppointmentID", appointmentId),
-                    DatabaseHelper.CreateInputParameter("@CancellationReason", cancellationReason),
-                    DatabaseHelper.CreateInputParameter("@CancellationDateTime", DateTime.Now)
+                    DatabaseHelper.CreateInputParameter("@AppointmentId", appointmentId),
+                    DatabaseHelper.CreateInputParameter("@CancellationReason", cancellationReason)
                 };
 
                 // Execute stored procedure
                 int rowsAffected = _dbHelper.ExecuteNonQuery("sp_CancelAppointment", parameters);
 
-                // Check if the cancellation was successful
-                return rowsAffected > 0;
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                // If no rows were affected, check current state to provide a useful error message.
+                var current = GetAppointmentById(appointmentId);
+                if (current == null)
+                {
+                    throw new Exception($"Cancellation failed: appointment not found (ID: {appointmentId}).");
+                }
+
+                if (string.Equals(current.Status, "Cancelled", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                throw new Exception($"Cancellation failed: no rows affected. Current status: '{current.Status}'. Verify dbo.sp_CancelAppointment updates the record and that the login has EXECUTE permission.");
             }
             catch (SqlException sqlEx)
             {
@@ -283,7 +295,7 @@ namespace HospitalNet.Backend.BusinessLogic
                 // Create parameters for stored procedure
                 var parameters = new[]
                 {
-                    DatabaseHelper.CreateInputParameter("@DoctorID", doctorId),
+                    DatabaseHelper.CreateInputParameter("@DoctorId", doctorId),
                     DatabaseHelper.CreateInputParameter("@StartDate", startDate),
                     DatabaseHelper.CreateInputParameter("@EndDate", endDate)
                 };
@@ -334,7 +346,7 @@ namespace HospitalNet.Backend.BusinessLogic
 
                 var parameters = new[]
                 {
-                    DatabaseHelper.CreateInputParameter("@AppointmentID", appointmentId)
+                    DatabaseHelper.CreateInputParameter("@AppointmentId", appointmentId)
                 };
 
                 var appointments = _dbHelper.ExecuteReader<Appointment>(
@@ -385,11 +397,27 @@ namespace HospitalNet.Backend.BusinessLogic
 
                 var parameters = new[]
                 {
-                    DatabaseHelper.CreateInputParameter("@AppointmentID", appointmentId)
+                    DatabaseHelper.CreateInputParameter("@AppointmentId", appointmentId)
                 };
 
                 int rowsAffected = _dbHelper.ExecuteNonQuery("sp_CompleteAppointment", parameters);
-                return rowsAffected > 0;
+                if (rowsAffected > 0)
+                {
+                    return true;
+                }
+
+                var current = GetAppointmentById(appointmentId);
+                if (current == null)
+                {
+                    throw new Exception($"Completion failed: appointment not found (ID: {appointmentId}).");
+                }
+
+                if (string.Equals(current.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                throw new Exception($"Completion failed: no rows affected. Current status: '{current.Status}'. Verify dbo.sp_CompleteAppointment updates the record and that the login has EXECUTE permission.");
             }
             catch (SqlException sqlEx)
             {

@@ -68,6 +68,11 @@ namespace HospitalNet.Backend.Infrastructure
             if (string.IsNullOrWhiteSpace(baseUrl))
                 throw new ArgumentNullException(nameof(baseUrl));
 
+            if (!baseUrl.EndsWith("/", StringComparison.Ordinal))
+            {
+                baseUrl += "/";
+            }
+
             var http = new HttpClient
             {
                 BaseAddress = new Uri(baseUrl, UriKind.Absolute),
@@ -83,4 +88,3 @@ namespace HospitalNet.Backend.Infrastructure
         }
     }
 }
-

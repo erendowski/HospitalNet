@@ -95,6 +95,7 @@ namespace HospitalNet.UI.Views
                     CompletedVisitsMetric.Text = "-";
                     CancellationRateMetric.Text = "-";
                     PatientLoadMetric.Text = "-";
+                    _lastReport = null;
                     return;
                 }
 
@@ -120,6 +121,7 @@ namespace HospitalNet.UI.Views
                 int totalAppointments = appointments.Count;
                 int completedAppointments = 0;
                 int cancelledAppointments = 0;
+                int scheduledAppointments = 0;
 
                 foreach (var apt in appointments)
                 {
@@ -127,6 +129,8 @@ namespace HospitalNet.UI.Views
                         completedAppointments++;
                     else if (apt.Status == "Cancelled")
                         cancelledAppointments++;
+                    else if (apt.Status == "Scheduled")
+                        scheduledAppointments++;
                 }
 
                 double cancellationRate = totalAppointments > 0 ? (double)cancelledAppointments / totalAppointments * 100 : 0;
@@ -148,21 +152,82 @@ namespace HospitalNet.UI.Views
 
                 try
                 {
-                    var report = _analyticsManager.GeneratePerformanceReport(startDate, endDate);
-                    _lastReport = report;
-                    AiSummaryTextBox.Text = string.Empty;
+                    _lastReport = _analyticsManager.GeneratePerformanceReport(startDate, endDate);
                 }
                 catch (Exception ex)
                 {
-                    _lastReport = null;
-                    StatusTextBlock.Text = $"Report generation failed: {ex.Message}";
+                    // Fallback report so AI summary can still be generated (doctor metrics may be unavailable due to permissions).
+                    int totalActivePatients = 0;
+                    int patientsWithAppointments = 0;
+                    int averagePatientsPerDoctor = 0;
+
+                    try
+                    {
+                        var patientManager = new PatientManager(App.ConnectionString);
+                        totalActivePatients = patientManager.GetAllActivePatients().Count;
+                        patientsWithAppointments = new System.Collections.Generic.HashSet<int>(appointments.ConvertAll(a => a.PatientID)).Count;
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+
+                    try
+                    {
+                        var doctorManager = new DoctorManager(App.ConnectionString);
+                        int doctorCount = doctorManager.GetAllDoctors().Count;
+                        averagePatientsPerDoctor = doctorCount > 0 ? (int)Math.Round((double)patientsWithAppointments / doctorCount) : 0;
+                    }
+                    catch
+                    {
+                        // ignore
+                    }
+
+                    _lastReport = new PerformanceReport
+                    {
+                        ReportDate = DateTime.Now,
+                        StartDate = startDate,
+                        EndDate = endDate,
+                        AppointmentStats = new AppointmentStatistics
+                        {
+                            StartDate = startDate,
+                            EndDate = endDate,
+                            TotalAppointments = totalAppointments,
+                            ScheduledAppointments = scheduledAppointments,
+                            CompletedAppointments = completedAppointments,
+                            CancelledAppointments = cancelledAppointments,
+                            NoShowAppointments = 0,
+                            CancellationRate = totalAppointments > 0 ? (int)Math.Round((double)cancelledAppointments * 100 / totalAppointments) : 0,
+                            CompletionRate = totalAppointments > 0 ? (int)Math.Round((double)completedAppointments * 100 / totalAppointments) : 0
+                        },
+                        PatientLoadStats = new PatientLoadStatistics
+                        {
+                            StartDate = startDate,
+                            EndDate = endDate,
+                            TotalActivePatients = totalActivePatients,
+                            NewPatientsRegistered = 0,
+                            PatientsWithAppointments = patientsWithAppointments,
+                            AveragePatientsPerDoctor = averagePatientsPerDoctor,
+                            TotalUniqueVisitors = patientsWithAppointments
+                        },
+                        DoctorMetrics = new System.Collections.Generic.List<DoctorPerformanceMetrics>(),
+                        SpecializationStats = new System.Collections.Generic.List<SpecializationStatistics>(),
+                        PeakTimes = new System.Collections.Generic.List<HourlyAppointmentStatistics>()
+                    };
+
+                    StatusTextBlock.Text = $"Limited report generated (DB metrics unavailable): {ex.Message}";
                 }
 
-                StatusTextBlock.Text = $"Report generated for {startDate:MM/dd/yyyy} to {endDate:MM/dd/yyyy}";
+                AiSummaryTextBox.Text = string.Empty;
+                if (_lastReport != null && !StatusTextBlock.Text.StartsWith("Limited report generated", StringComparison.OrdinalIgnoreCase))
+                {
+                    StatusTextBlock.Text = $"Report generated for {startDate:MM/dd/yyyy} to {endDate:MM/dd/yyyy}";
+                }
             }
             catch (Exception ex)
             {
                 StatusTextBlock.Text = $"Error generating report: {ex.Message}";
+                _lastReport = null;
             }
         }
 

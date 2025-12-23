@@ -85,7 +85,7 @@ namespace HospitalNet.Backend.Infrastructure
                 sb.AppendLine("PEAK TIMES");
                 foreach (var p in report.PeakTimes.Take(10))
                 {
-                    sb.AppendLine($"- {p.TimeRange} — appointments={p.AppointmentCount}, doctors={p.DoctorCount}, avgPatients={p.AveragePatients}");
+                    sb.AppendLine($"- {p.TimeRange} - appointments={p.AppointmentCount}, doctors={p.DoctorCount}, avgPatients={p.AveragePatients}");
                 }
                 sb.AppendLine();
             }

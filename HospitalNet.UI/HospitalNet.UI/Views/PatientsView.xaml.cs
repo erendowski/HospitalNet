@@ -247,8 +247,8 @@ namespace HospitalNet.UI.Views
             if (sender is Button btn && btn.Tag is int patientId)
             {
                 var result = MessageBox.Show(
-                    "Are you sure you want to remove this patient? This action will deactivate the patient record.",
-                    "Confirm Delete",
+                    "Are you sure you want to deactivate this patient?\n\nThis does not physically delete the row from the database; it sets IsActive = 0 so the patient disappears from active lists.",
+                    "Confirm Deactivation",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Question);
 
@@ -258,13 +258,13 @@ namespace HospitalNet.UI.Views
                     {
                         _patientManager.DeactivatePatient(patientId);
                         LoadPatients();
-                        StatusTextBlock.Text = "Patient removed successfully";
+                        StatusTextBlock.Text = "Patient deactivated successfully";
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show(
-                            $"Failed to delete patient:\n{ex.Message}",
-                            "Delete Error",
+                            $"Failed to deactivate patient:\n{ex.Message}",
+                            "Deactivation Error",
                             MessageBoxButton.OK,
                             MessageBoxImage.Error);
                     }
