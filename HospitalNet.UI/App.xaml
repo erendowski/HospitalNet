@@ -33,6 +33,7 @@
         <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
         <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceBaseColor}"/>
         <SolidColorBrush x:Key="SurfaceColor" Color="{StaticResource SurfaceBaseColor}"/>
+        <SolidColorBrush x:Key="SurfaceAltBrush" Color="#F5F5F5"/>
         <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
         <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
         <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
@@ -138,7 +139,7 @@
             <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -166,7 +167,7 @@
         <Style x:Key="LabelStyle" TargetType="Label">
             <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
             <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
             <Setter Property="Padding" Value="0,4,0,8"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -175,16 +176,16 @@
         <Style x:Key="StandardDataGridStyle" TargetType="DataGrid">
             <Setter Property="FontFamily" Value="{StaticResource DefaultFont}"/>
             <Setter Property="FontSize" Value="{StaticResource FontSizeNormal}"/>
-            <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
             <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderBrush}"/>
             <Setter Property="RowHeight" Value="32"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="CanUserAddRows" Value="False"/>
             <Setter Property="CanUserDeleteRows" Value="False"/>
             <Setter Property="CanUserReorderColumns" Value="False"/>
             <Setter Property="CanUserResizeRows" Value="False"/>
-            <Setter Property="AlternatingRowBackground" Value="#F5F5F5"/>
+            <Setter Property="AlternatingRowBackground" Value="{DynamicResource SurfaceAltBrush}"/>
         </Style>
     </Application.Resources>
 </Application>

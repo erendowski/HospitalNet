@@ -227,6 +227,7 @@ GRANT EXECUTE ON OBJECT::dbo.sp_CheckDoctorAvailability TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetAppointmentById TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_CompleteAppointment TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_DeleteAppointment TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_DeleteExpiredAppointments TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientAppointments TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetAvailableTimeSlots TO HospitalAdminRole;
 
@@ -279,6 +280,7 @@ GRANT EXECUTE ON OBJECT::dbo.sp_CheckDoctorAvailability TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetAppointmentById TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_CompleteAppointment TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_DeleteAppointment TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_DeleteExpiredAppointments TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientAppointments TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetAvailableTimeSlots TO HospitalUserRole;
 

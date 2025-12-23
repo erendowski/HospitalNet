@@ -301,6 +301,41 @@ namespace HospitalNet.Backend.BusinessLogic
         }
 
         /// <summary>
+        /// Deletes appointments whose date/time has already passed.
+        /// Calls sp_DeleteExpiredAppointments stored procedure.
+        /// </summary>
+        /// <returns>Number of affected rows (updates + deletes).</returns>
+        public int DeleteExpiredAppointments(DateTime now)
+        {
+            try
+            {
+                var parameters = new[]
+                {
+                    DatabaseHelper.CreateInputParameter("@Now", SqlDbType.DateTime2, now)
+                };
+
+                return _dbHelper.ExecuteNonQuery("dbo.sp_DeleteExpiredAppointments", parameters);
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Message != null &&
+                    sqlEx.Message.IndexOf("Could not find stored procedure", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    throw new Exception(
+                        $"Database error while deleting expired appointments: {sqlEx.Message}\n\n" +
+                        "Fix: run the SQL script `Database/12_Add_DeleteExpiredAppointments_Proc.sql` against the same database.",
+                        sqlEx);
+                }
+
+                throw new Exception($"Database error while deleting expired appointments: {sqlEx.Message}", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting expired appointments: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Checks if a doctor is available for a specific time slot.
         /// Calls sp_CheckDoctorAvailability stored procedure.
         /// </summary>
@@ -487,8 +522,7 @@ namespace HospitalNet.Backend.BusinessLogic
                 int rowsAffected = _dbHelper.ExecuteNonQuery("sp_CompleteAppointment", parameters);
                 if (rowsAffected > 0)
                 {
-                    // User requirement: completing an appointment should also remove it from the system.
-                    return DeleteAppointment(appointmentId);
+                    return true;
                 }
 
                 var current = GetAppointmentById(appointmentId);
@@ -499,7 +533,7 @@ namespace HospitalNet.Backend.BusinessLogic
 
                 if (string.Equals(current.Status, "Completed", StringComparison.OrdinalIgnoreCase))
                 {
-                    return DeleteAppointment(appointmentId);
+                    return true;
                 }
 
                 throw new Exception($"Completion failed: no rows affected. Current status: '{current.Status}'. Verify dbo.sp_CompleteAppointment updates the record and that the login has EXECUTE permission.");

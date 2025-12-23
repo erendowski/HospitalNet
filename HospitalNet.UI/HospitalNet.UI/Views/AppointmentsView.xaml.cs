@@ -219,6 +219,16 @@ namespace HospitalNet.UI.Views
                 if (_selectedDoctor == null || !DatePicker.SelectedDate.HasValue)
                     return;
 
+                // Auto-cleanup: remove past appointments so the UI stays in sync with DB policy.
+                try
+                {
+                    _appointmentManager.DeleteExpiredAppointments(DateTime.Now);
+                }
+                catch
+                {
+                    // Ignore cleanup failures here to avoid blocking the page.
+                }
+
                 var appointments = _appointmentManager.GetAppointmentsByDoctorAndDate(
                     _selectedDoctor.DoctorID,
                     _selectedDate);
@@ -312,6 +322,7 @@ namespace HospitalNet.UI.Views
                     return;
 
                 _appointmentManager.CompleteAppointment(_selectedAppointmentRow.AppointmentID);
+                App.RaiseAppointmentsChanged();
 
                 RefreshAppointmentsList();
                 SetSelectedAppointmentRow(null);
@@ -348,6 +359,7 @@ namespace HospitalNet.UI.Views
                     return;
 
                 _appointmentManager.DeleteAppointment(_selectedAppointmentRow.AppointmentID);
+                App.RaiseAppointmentsChanged();
 
                 RefreshAppointmentsList();
                 SetSelectedAppointmentRow(null);
@@ -429,6 +441,7 @@ namespace HospitalNet.UI.Views
                     TimeTextBox.Text = "09:00";
                     ReasonTextBox.Text = string.Empty;
 
+                    App.RaiseAppointmentsChanged();
                     RefreshAppointmentsList();
                     SetSelectedAppointmentRow(null);
                 }

@@ -452,6 +452,29 @@ BEGIN
 END
 GO
 
+CREATE OR ALTER PROCEDURE dbo.sp_DeleteExpiredAppointments
+    @Now DATETIME2
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    ;WITH Expired AS
+    (
+        SELECT AppointmentID
+        FROM dbo.Appointments
+        WHERE DATEADD(minute, DurationMinutes, AppointmentDateTime) < @Now
+          AND Status IN (N'Scheduled', N'Cancelled')
+    )
+    UPDATE dbo.MedicalRecords
+    SET AppointmentID = NULL,
+        UpdatedDate = sysdatetime()
+    WHERE AppointmentID IN (SELECT AppointmentID FROM Expired);
+
+    DELETE FROM dbo.Appointments
+    WHERE AppointmentID IN (SELECT AppointmentID FROM Expired);
+END
+GO
+
 CREATE OR ALTER PROCEDURE dbo.sp_GetPatientAppointments @PatientId INT
 AS
 BEGIN

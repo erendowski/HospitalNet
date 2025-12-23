@@ -11,10 +11,12 @@ namespace HospitalNet.UI.Views
     public partial class SettingsView : UserControl
     {
         private DatabaseHelper _databaseHelper;
+        private bool _themeInitialized;
 
         public SettingsView()
         {
             InitializeComponent();
+            InitializeTheme();
             if (App.OfflineMode)
             {
                 ConnectionStringTextBox.Text = TrimConnectionString(App.ConnectionString);
@@ -26,6 +28,31 @@ namespace HospitalNet.UI.Views
             }
 
             LoadSettings();
+        }
+
+        private void InitializeTheme()
+        {
+            // Reflect current theme selection in UI without re-applying repeatedly.
+            ThemeComboBox.SelectedIndex = App.CurrentTheme.Equals("Dark", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+            _themeInitialized = true;
+        }
+
+        private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_themeInitialized)
+                return;
+
+            if (ThemeComboBox.SelectedItem is ComboBoxItem item &&
+                item.Content is string label &&
+                label.IndexOf("Dark", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                App.ApplyTheme("Dark");
+                StatusTextBlock.Text = "Theme applied: Dark";
+                return;
+            }
+
+            App.ApplyTheme("Light");
+            StatusTextBlock.Text = "Theme applied: Light";
         }
 
         private void LoadSettings()
