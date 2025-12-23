@@ -38,7 +38,7 @@
             </Grid>
         </Border>
 
-        <Border Grid.Row="2" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+        <Border Grid.Row="2" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -50,19 +50,65 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="Appointments for Selected Doctor &amp; Date" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="20,15,20,10"/>
+                <TextBlock Grid.Row="0" Grid.ColumnSpan="3" Text="Appointments for Selected Doctor &amp; Date" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
 
-                <DataGrid Grid.Row="1" Grid.Column="0" x:Name="AppointmentsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" ColumnHeaderHeight="40" Margin="0,0,0,0" SelectionChanged="AppointmentsDataGrid_SelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Binding="{Binding AppointmentTime, StringFormat=HH:mm}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" Width="200" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Reason" Binding="{Binding ReasonForVisit}" Width="300" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Border Grid.Row="1" Grid.Column="0" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Time" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Grid.Column="1" Text="Patient" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Grid.Column="2" Text="Reason" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Grid.Column="3" Text="Status" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        </Grid>
+
+                        <ListBox Grid.Row="1"
+                                 x:Name="AppointmentsListBox"
+                                 SelectionChanged="AppointmentsListBox_SelectionChanged"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="10"
+                                            Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="200"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="120"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0" Text="{Binding AppointmentTime, StringFormat={}{0:HH:mm}}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding PatientName}" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding ReasonForVisit}" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding Status}" Foreground="{StaticResource TextPrimaryBrush}" TextTrimming="CharacterEllipsis"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
 
                 <!-- Selected items -->
-                <Border Grid.Row="1" Grid.Column="2" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,0,15,15" Padding="12">
+                <Border Grid.Row="1" Grid.Column="2" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,0,0,0" Padding="12">
                     <StackPanel>
                         <TextBlock Text="Selected Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
 

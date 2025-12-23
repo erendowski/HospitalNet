@@ -84,34 +84,11 @@
             </Border>
         </StackPanel>
 
-        <Border Grid.Row="3" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Text="Doctor Performance Metrics" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="20,15,20,10"/>
-
-                <DataGrid Grid.Row="1" x:Name="PerformanceMetricsGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" ColumnHeaderHeight="40">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Doctor" Binding="{Binding DoctorName}" Width="200" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Total Appointments" Binding="{Binding TotalAppointments}" Width="150" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Completed" Binding="{Binding CompletedAppointments}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Completion Rate" Binding="{Binding CompletionRate, StringFormat=0.00%}" Width="130" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Avg Visit Duration (min)" Binding="{Binding AvgVisitDuration, StringFormat=0}" Width="180" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Patient Satisfaction" Binding="{Binding PatientSatisfaction, StringFormat=0.00}" Width="160" Foreground="{StaticResource TextPrimaryBrush}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-
-                <Border Grid.Row="2" Margin="20,15,20,20" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12">
-                    <StackPanel>
-                        <TextBlock Text="AI Summary" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
-                        <TextBox x:Name="AiSummaryTextBox" Height="120" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Style="{StaticResource StandardTextBoxStyle}" Background="{StaticResource SurfaceBrush}" />
-                    </StackPanel>
-                </Border>
-            </Grid>
+        <Border Grid.Row="3" Margin="20,0,20,20" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20">
+            <StackPanel>
+                <TextBlock Text="AI Summary" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
+                <TextBox x:Name="AiSummaryTextBox" Height="220" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Style="{StaticResource StandardTextBoxStyle}" Background="{StaticResource BackgroundBrush}" />
+            </StackPanel>
         </Border>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">

@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using HospitalNet.Backend.BusinessLogic;
-using HospitalNet.Backend.Models;
 using HospitalNet.Backend.Infrastructure;
+using HospitalNet.Backend.Models;
 
 namespace HospitalNet.UI.Views
 {
@@ -31,14 +32,15 @@ namespace HospitalNet.UI.Views
         private Patient _selectedPatient;
         private AppointmentDisplayRow _selectedAppointmentRow;
         private DateTime _selectedDate;
-        private readonly System.Collections.Generic.Dictionary<int, Patient> _patientsById = new System.Collections.Generic.Dictionary<int, Patient>();
+        private readonly Dictionary<int, Patient> _patientsById = new Dictionary<int, Patient>();
 
         public AppointmentsView()
         {
             InitializeComponent();
+
             if (App.OfflineMode)
             {
-                AppointmentsDataGrid.ItemsSource = null;
+                AppointmentsListBox.ItemsSource = null;
                 BookButton.IsEnabled = false;
                 SetSelectedDoctor(null);
                 SetSelectedPatient(null);
@@ -73,7 +75,8 @@ namespace HospitalNet.UI.Views
                 return;
             }
 
-            SelectedAppointmentText.Text = $"#{row.AppointmentID} • {row.AppointmentTime:g} • {row.Status}\n{row.PatientName}\n{row.ReasonForVisit}";
+            SelectedAppointmentText.Text =
+                $"#{row.AppointmentID} | {row.AppointmentTime:g} | {row.Status}\n{row.PatientName}\n{row.ReasonForVisit}";
         }
 
         private void InitializeManagers()
@@ -103,7 +106,7 @@ namespace HospitalNet.UI.Views
                 _appointmentManager = new AppointmentManager(App.ConnectionString);
                 BookButton.IsEnabled = true;
             }
-            catch (Exception)
+            catch
             {
                 _doctorManager = null;
                 _patientManager = null;
@@ -129,7 +132,7 @@ namespace HospitalNet.UI.Views
                     DoctorComboBox.SelectedIndex = 0;
                 }
             }
-            catch (Exception)
+            catch
             {
                 DoctorComboBox.ItemsSource = null;
             }
@@ -154,12 +157,13 @@ namespace HospitalNet.UI.Views
                 {
                     _patientsById[patient.PatientID] = patient;
                 }
+
                 if (patients.Count > 0)
                 {
                     PatientComboBox.SelectedIndex = 0;
                 }
             }
-            catch (Exception)
+            catch
             {
                 PatientComboBox.ItemsSource = null;
                 _patientsById.Clear();
@@ -192,7 +196,7 @@ namespace HospitalNet.UI.Views
             {
                 if (_appointmentManager == null || _patientManager == null)
                 {
-                    AppointmentsDataGrid.ItemsSource = null;
+                    AppointmentsListBox.ItemsSource = null;
                     return;
                 }
 
@@ -214,6 +218,7 @@ namespace HospitalNet.UI.Views
                             _patientsById[patient.PatientID] = patient;
                         }
                     }
+
                     var patientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown";
 
                     displayAppointments.Add(new AppointmentDisplayRow
@@ -228,11 +233,11 @@ namespace HospitalNet.UI.Views
                     });
                 }
 
-                AppointmentsDataGrid.ItemsSource = displayAppointments;
+                AppointmentsListBox.ItemsSource = displayAppointments;
             }
-            catch (Exception)
+            catch
             {
-                AppointmentsDataGrid.ItemsSource = null;
+                AppointmentsListBox.ItemsSource = null;
             }
         }
 
@@ -247,9 +252,9 @@ namespace HospitalNet.UI.Views
             SetSelectedPatient(null);
         }
 
-        private void AppointmentsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AppointmentsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (AppointmentsDataGrid.SelectedItem is AppointmentDisplayRow row)
+            if (AppointmentsListBox.SelectedItem is AppointmentDisplayRow row)
             {
                 SetSelectedAppointmentRow(row);
 
@@ -301,7 +306,7 @@ namespace HospitalNet.UI.Views
                     return;
                 }
 
-                if (!TimeSpan.TryParse(TimeTextBox.Text, out TimeSpan appointmentTime))
+                if (!TimeSpan.TryParse(TimeTextBox.Text, out var appointmentTime))
                 {
                     MessageBox.Show("Invalid time format. Please use HH:mm (e.g., 14:30).", "Time Format Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
@@ -320,7 +325,7 @@ namespace HospitalNet.UI.Views
                             DoctorID = _selectedDoctor.DoctorID,
                             PatientID = patientId,
                             AppointmentDateTime = appointmentDateTime,
-                            DurationMinutes = 30, // Default 30 minutes
+                            DurationMinutes = 30,
                             ReasonForVisit = reason,
                             Status = "Scheduled"
                         });

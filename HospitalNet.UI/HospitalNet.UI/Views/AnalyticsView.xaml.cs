@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -24,7 +23,6 @@ namespace HospitalNet.UI.Views
             InitializeComponent();
             if (App.OfflineMode)
             {
-                PerformanceMetricsGrid.ItemsSource = null;
                 StatusTextBlock.Text = "Analytics offline (no database connection).";
                 return;
             }
@@ -93,7 +91,6 @@ namespace HospitalNet.UI.Views
                 if (_analyticsManager == null || _appointmentManager == null)
                 {
                     StatusTextBlock.Text = "Analytics offline (no database connection).";
-                    PerformanceMetricsGrid.ItemsSource = null;
                     TotalAppointmentsMetric.Text = "-";
                     CompletedVisitsMetric.Text = "-";
                     CancellationRateMetric.Text = "-";
@@ -154,28 +151,11 @@ namespace HospitalNet.UI.Views
                     var report = _analyticsManager.GeneratePerformanceReport(startDate, endDate);
                     _lastReport = report;
                     AiSummaryTextBox.Text = string.Empty;
-
-                    var displayMetrics = new ObservableCollection<dynamic>();
-                    foreach (var metric in report.DoctorMetrics)
-                    {
-                        displayMetrics.Add(new
-                        {
-                            DoctorName = $"Dr. {metric.FirstName} {metric.LastName}",
-                            TotalAppointments = metric.TotalAppointments,
-                            CompletedAppointments = metric.CompletedAppointments,
-                            CompletionRate = metric.TotalAppointments > 0 ? (double)metric.CompletedAppointments / metric.TotalAppointments : 0,
-                            AvgVisitDuration = metric.AverageAppointmentDuration,
-                            PatientSatisfaction = 0
-                        });
-                    }
-
-                    PerformanceMetricsGrid.ItemsSource = displayMetrics;
                 }
                 catch (Exception ex)
                 {
-                    PerformanceMetricsGrid.ItemsSource = null;
                     _lastReport = null;
-                    StatusTextBlock.Text = $"Doctor metrics unavailable: {ex.Message}";
+                    StatusTextBlock.Text = $"Report generation failed: {ex.Message}";
                 }
 
                 StatusTextBlock.Text = $"Report generated for {startDate:MM/dd/yyyy} to {endDate:MM/dd/yyyy}";
