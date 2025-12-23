@@ -41,7 +41,7 @@ namespace HospitalNet.UI.Dialogs
                 LastNameTextBox.Text = _editingPatient.LastName;
                 PhoneTextBox.Text = _editingPatient.Phone;
                 EmailTextBox.Text = _editingPatient.Email;
-                DateOfBirthPicker.SelectedDate = _editingPatient.DateOfBirth;
+                DateOfBirthPicker.SelectedDate = _editingPatient.DateOfBirth == DateTime.MinValue ? null : _editingPatient.DateOfBirth;
                 MedicalHistoryTextBox.Text = _editingPatient.MedicalHistory ?? string.Empty;
                 AllergiesTextBox.Text = _editingPatient.Allergies ?? string.Empty;
             }
@@ -91,7 +91,15 @@ namespace HospitalNet.UI.Dialogs
                     return;
                 }
 
-                _patientManager = new PatientManager(App.GetConnectionString());
+                // SqlDateTime (datetime) overflows before 1753; we store as DATE, but ensure safety for mixed schemas/older SPs.
+                if (DateOfBirthPicker.SelectedDate.Value.Year < 1753)
+                {
+                    StatusTextBlock.Text = "Date of birth must be 1753 or later";
+                    return;
+                }
+
+                // Use the effective connection string for the signed-in session (may differ from app.config).
+                _patientManager = new PatientManager(App.ConnectionString);
 
                 if (_isEditMode)
                 {

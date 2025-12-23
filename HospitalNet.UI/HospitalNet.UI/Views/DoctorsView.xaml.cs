@@ -16,12 +16,25 @@ namespace HospitalNet.UI.Views
     /// </summary>
     public partial class DoctorsView : UserControl
     {
+        private sealed class AppointmentDisplayRow
+        {
+            public int AppointmentID { get; set; }
+            public int PatientID { get; set; }
+            public int DoctorID { get; set; }
+            public DateTime AppointmentTime { get; set; }
+            public string PatientName { get; set; }
+            public string ReasonForVisit { get; set; }
+            public string Status { get; set; }
+        }
+
         private DoctorManager _doctorManager;
         private AppointmentManager _appointmentManager;
         private PatientManager _patientManager;
         private List<Doctor> _allDoctors;
+        private readonly Dictionary<int, Patient> _patientsById = new Dictionary<int, Patient>();
         private Doctor _selectedDoctor;
         private DateTime _selectedDate;
+        private AppointmentDisplayRow _selectedAppointmentRow;
 
         public DoctorsView()
         {
@@ -33,13 +46,18 @@ namespace HospitalNet.UI.Views
                 DoctorsDataGrid.ItemsSource = null;
                 AppointmentsDataGrid.ItemsSource = null;
                 StatusTextBlock.Text = "Doctors offline (no database connection).";
+                AddDoctorButton.IsEnabled = false;
+                RefreshButton.IsEnabled = false;
+                AddDoctorPanel.Visibility = Visibility.Collapsed;
+                SelectedAppointmentSummaryText.Text = "-";
                 return;
             }
 
             InitializeManagers();
-            AppointmentDatePicker.SelectedDate = DateTime.Today;
             _selectedDate = DateTime.Today;
+            AppointmentsDateFilterPicker.SelectedDate = _selectedDate;
             LoadDoctors();
+            SelectedAppointmentSummaryText.Text = "-";
         }
 
         private void InitializeManagers()
@@ -118,6 +136,9 @@ namespace HospitalNet.UI.Views
        ((d.LicenseNumber ?? "").ToLower().Contains(searchTerm)) ||
        ((d.Email ?? "").ToLower().Contains(searchTerm))
    ).ToList();
+
+                DoctorsDataGrid.ItemsSource = new ObservableCollection<Doctor>(filtered);
+                StatusTextBlock.Text = $"Showing {filtered.Count} doctors";
             }
         }
 
@@ -125,24 +146,29 @@ namespace HospitalNet.UI.Views
         {
             try
             {
-                if (App.CurrentUser != null && !App.CurrentUser.IsAdmin)
+                if (AddDoctorPanel.Visibility != Visibility.Visible)
                 {
-                    MessageBox.Show(
-                        "You do not have permission to add doctors.",
-                        "Permission Denied",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                    return;
+                    AddDoctorPanel.Visibility = Visibility.Visible;
+                    DetailsScrollViewer?.ScrollToTop();
+
+                    NewDoctorFirstNameTextBox.Text = string.Empty;
+                    NewDoctorLastNameTextBox.Text = string.Empty;
+                    NewDoctorSpecializationTextBox.Text = "General Practice";
+                    NewDoctorLicenseTextBox.Text = string.Empty;
+                    NewDoctorPhoneTextBox.Text = string.Empty;
+                    NewDoctorEmailTextBox.Text = string.Empty;
+                    NewDoctorOfficeTextBox.Text = string.Empty;
+                    NewDoctorYearsTextBox.Text = "0";
+                    NewDoctorMaxPatientsTextBox.Text = "20";
+                    NewDoctorSalaryTextBox.Text = "0";
+                    NewDoctorIsActiveCheckBox.IsChecked = true;
+
+                    StatusTextBlock.Text = "Enter doctor details and click Save.";
+                    NewDoctorFirstNameTextBox.Focus();
                 }
-
-                var dialog = new AddDoctorDialog();
-                dialog.Owner = Window.GetWindow(this);
-                bool? result = dialog.ShowDialog();
-
-                if (result == true)
+                else
                 {
-                    LoadDoctors();
-                    StatusTextBlock.Text = "Doctor added successfully";
+                    AddDoctorPanel.Visibility = Visibility.Collapsed;
                 }
             }
             catch (Exception ex)
@@ -153,14 +179,10 @@ namespace HospitalNet.UI.Views
 
         private void ApplyAuthorization()
         {
-            bool canAddDoctor = App.CurrentUser == null || App.CurrentUser.IsAdmin;
-
             if (AddDoctorButton != null)
             {
-                AddDoctorButton.IsEnabled = canAddDoctor;
-                AddDoctorButton.ToolTip = canAddDoctor
-                    ? "Add Doctor"
-                    : "Admin permission required";
+                AddDoctorButton.IsEnabled = true;
+                AddDoctorButton.ToolTip = "Add Doctor";
             }
         }
 
@@ -180,7 +202,12 @@ namespace HospitalNet.UI.Views
                 _selectedDoctor = doctor;
                 UpdateDoctorDetails(doctor);
                 LoadAppointmentsForDoctor(doctor.DoctorID);
+                SetSelectedAppointmentRow(null);
+                return;
             }
+
+            _selectedDoctor = null;
+            ClearDoctorDetails();
         }
 
         private void UpdateDoctorDetails(Doctor doctor)
@@ -206,6 +233,20 @@ namespace HospitalNet.UI.Views
             DoctorExperienceTextBlock.Text = "-";
             DoctorMaxPatientsTextBlock.Text = "-";
             AppointmentsDataGrid.ItemsSource = null;
+            SetSelectedAppointmentRow(null);
+        }
+
+        private void SetSelectedAppointmentRow(AppointmentDisplayRow row)
+        {
+            _selectedAppointmentRow = row;
+            if (row == null)
+            {
+                SelectedAppointmentSummaryText.Text = "-";
+                return;
+            }
+
+            SelectedAppointmentSummaryText.Text =
+                $"#{row.AppointmentID} • {row.AppointmentTime:g} • {row.Status}\n{row.PatientName}\n{row.ReasonForVisit}";
         }
 
         private void LoadAppointmentsForDoctor(int doctorId)
@@ -219,16 +260,25 @@ namespace HospitalNet.UI.Views
                 }
 
                 var appointments = _appointmentManager.GetAppointmentsByDoctorAndDate(doctorId, _selectedDate);
-                var displayAppointments = new ObservableCollection<dynamic>();
+                var displayAppointments = new ObservableCollection<AppointmentDisplayRow>();
 
                 foreach (var apt in appointments)
                 {
-                    var patient = _patientManager.GetPatientByID(apt.PatientID);
+                    if (!_patientsById.TryGetValue(apt.PatientID, out var patient))
+                    {
+                        patient = _patientManager.GetPatientByID(apt.PatientID);
+                        if (patient != null)
+                        {
+                            _patientsById[apt.PatientID] = patient;
+                        }
+                    }
                     var patientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown";
 
-                    displayAppointments.Add(new
+                    displayAppointments.Add(new AppointmentDisplayRow
                     {
                         AppointmentID = apt.AppointmentID,
+                        DoctorID = apt.DoctorID,
+                        PatientID = apt.PatientID,
                         AppointmentTime = apt.AppointmentDateTime,
                         PatientName = patientName,
                         ReasonForVisit = apt.ReasonForVisit,
@@ -246,10 +296,115 @@ namespace HospitalNet.UI.Views
             }
         }
 
+        private void AppointmentsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (AppointmentsDataGrid.SelectedItem is AppointmentDisplayRow row)
+            {
+                SetSelectedAppointmentRow(row);
+                return;
+            }
+
+            SetSelectedAppointmentRow(null);
+        }
+
+        private void CancelAddDoctor_Click(object sender, RoutedEventArgs e)
+        {
+            AddDoctorPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void SaveAddDoctor_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_doctorManager == null)
+                {
+                    StatusTextBlock.Text = "Doctors offline (no database connection).";
+                    return;
+                }
+
+                var firstName = (NewDoctorFirstNameTextBox.Text ?? string.Empty).Trim();
+                var lastName = (NewDoctorLastNameTextBox.Text ?? string.Empty).Trim();
+                var specialization = (NewDoctorSpecializationTextBox.Text ?? string.Empty).Trim();
+                var license = (NewDoctorLicenseTextBox.Text ?? string.Empty).Trim();
+                var phone = (NewDoctorPhoneTextBox.Text ?? string.Empty).Trim();
+                var email = (NewDoctorEmailTextBox.Text ?? string.Empty).Trim();
+                var office = (NewDoctorOfficeTextBox.Text ?? string.Empty).Trim();
+
+                if (string.IsNullOrWhiteSpace(firstName) ||
+                    string.IsNullOrWhiteSpace(lastName) ||
+                    string.IsNullOrWhiteSpace(specialization) ||
+                    string.IsNullOrWhiteSpace(license) ||
+                    string.IsNullOrWhiteSpace(phone) ||
+                    string.IsNullOrWhiteSpace(email) ||
+                    string.IsNullOrWhiteSpace(office))
+                {
+                    StatusTextBlock.Text = "Please fill all required fields.";
+                    return;
+                }
+
+                if (!int.TryParse(NewDoctorYearsTextBox.Text, out int years) || years < 0)
+                {
+                    StatusTextBlock.Text = "Years of experience must be a non-negative number.";
+                    return;
+                }
+
+                if (!int.TryParse(NewDoctorMaxPatientsTextBox.Text, out int maxPatients) || maxPatients <= 0)
+                {
+                    StatusTextBlock.Text = "Max patients/day must be greater than 0.";
+                    return;
+                }
+
+                if (!decimal.TryParse(NewDoctorSalaryTextBox.Text, out decimal salary) || salary < 0)
+                {
+                    StatusTextBlock.Text = "Salary must be a non-negative number.";
+                    return;
+                }
+
+                var newDoctor = new Doctor
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Specialization = specialization,
+                    LicenseNumber = license,
+                    PhoneNumber = phone,
+                    Email = email,
+                    OfficeLocation = office,
+                    YearsOfExperience = years,
+                    MaxPatientCapacityPerDay = maxPatients,
+                    Salary = salary,
+                    IsActive = NewDoctorIsActiveCheckBox.IsChecked ?? true
+                };
+
+                _doctorManager.RegisterDoctor(newDoctor);
+                LoadDoctors();
+                AddDoctorPanel.Visibility = Visibility.Collapsed;
+                StatusTextBlock.Text = $"Doctor added: Dr. {newDoctor.FullName}";
+            }
+            catch (Exception ex)
+            {
+                StatusTextBlock.Text = $"Failed to add doctor: {ex.Message}";
+                MessageBox.Show(
+                    $"Failed to add doctor:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
         private void EditDoctor_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                if (App.CurrentUser != null && !App.CurrentUser.IsAdmin)
+                {
+                    MessageBox.Show(
+                        "You do not have permission to edit doctors.",
+                        "Permission Denied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (sender is not Button btn || btn.Tag is not int doctorId)
                     return;
 
@@ -280,6 +435,16 @@ namespace HospitalNet.UI.Views
         {
             try
             {
+                if (App.CurrentUser != null && !App.CurrentUser.IsAdmin)
+                {
+                    MessageBox.Show(
+                        "You do not have permission to deactivate doctors.",
+                        "Permission Denied",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (sender is not Button btn || btn.Tag is not int doctorId)
                     return;
 
@@ -312,6 +477,8 @@ namespace HospitalNet.UI.Views
             }
         }
 
+#if false
+        // Appointment creation is intentionally restricted to the Appointments tab.
         private void AddAppointmentButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedDoctor == null)
@@ -330,6 +497,7 @@ namespace HospitalNet.UI.Views
             DurationTextBox.Text = "30";
             ReasonTextBox.Text = "";
             PatientComboBox.SelectedIndex = -1;
+            SetSelectedPatientForAppointment(null);
         }
 
         private void LoadPatientsForComboBox()
@@ -339,18 +507,74 @@ namespace HospitalNet.UI.Views
                 if (_patientManager == null)
                 {
                     PatientComboBox.ItemsSource = null;
+                    SetSelectedPatientForAppointment(null);
                     return;
                 }
 
                 var patients = _patientManager.GetAllActivePatients();
                 PatientComboBox.ItemsSource = new ObservableCollection<Patient>(patients);
+                _patientsById.Clear();
+                foreach (var patient in patients)
+                {
+                    _patientsById[patient.PatientID] = patient;
+                }
+
+                if (patients.Count > 0)
+                {
+                    PatientComboBox.SelectedIndex = 0;
+                    SetSelectedPatientForAppointment(PatientComboBox.SelectedItem as Patient);
+                }
+                else
+                {
+                    SetSelectedPatientForAppointment(null);
+                }
             }
             catch (Exception ex)
             {
                 StatusTextBlock.Text = $"Error loading patients: {ex.Message}";
+                SetSelectedPatientForAppointment(null);
             }
         }
 
+        private void SetSelectedPatientForAppointment(Patient patient)
+        {
+            if (patient == null)
+            {
+                SelectedPatientForAppointmentText.Text = "-";
+                SelectedPatientForAppointmentMetaText.Text = "-";
+                return;
+            }
+
+            SelectedPatientForAppointmentText.Text = $"{patient.FullName} (ID: {patient.PatientID})";
+            SelectedPatientForAppointmentMetaText.Text = $"{patient.PhoneNumber ?? "-"} • {patient.Email ?? "-"}";
+        }
+
+        private void PatientComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PatientComboBox.SelectedItem is Patient patient)
+            {
+                SetSelectedPatientForAppointment(patient);
+                return;
+            }
+
+            SetSelectedPatientForAppointment(null);
+        }
+
+#endif
+
+        private void AppointmentsDateFilterPicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (AppointmentsDateFilterPicker.SelectedDate.HasValue)
+            {
+                _selectedDate = AppointmentsDateFilterPicker.SelectedDate.Value.Date;
+                if (_selectedDoctor != null)
+                {
+                    LoadAppointmentsForDoctor(_selectedDoctor.DoctorID);
+                }
+            }
+        }
+
+#if false
         private void CancelAppointmentForm_Click(object sender, RoutedEventArgs e)
         {
             NewAppointmentPanel.Visibility = Visibility.Collapsed;
@@ -461,5 +685,6 @@ namespace HospitalNet.UI.Views
                 MessageBox.Show($"Failed to schedule appointment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+#endif
     }
 }

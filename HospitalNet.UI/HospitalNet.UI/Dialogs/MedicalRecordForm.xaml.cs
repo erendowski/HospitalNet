@@ -20,6 +20,13 @@ namespace HospitalNet.UI.Dialogs
             _appointment = appointment;
             _patient = patient;
 
+            if (_appointment == null || _patient == null)
+            {
+                StatusTextBlock.Text = "Cannot record a medical visit without a valid appointment and patient.";
+                SaveButton.IsEnabled = false;
+                return;
+            }
+
             if (patient != null)
             {
                 PatientInfoTextBlock.Text = $"Patient: {patient.FirstName} {patient.LastName} | Age: {patient.Age} | ID: {patient.PatientID}";
@@ -30,6 +37,12 @@ namespace HospitalNet.UI.Dialogs
         {
             try
             {
+                if (_appointment == null || _patient == null)
+                {
+                    StatusTextBlock.Text = "Missing appointment/patient context.";
+                    return;
+                }
+
                 if (string.IsNullOrWhiteSpace(ClinicalNotesTextBox.Text))
                 {
                     StatusTextBlock.Text = "Clinical notes are required";

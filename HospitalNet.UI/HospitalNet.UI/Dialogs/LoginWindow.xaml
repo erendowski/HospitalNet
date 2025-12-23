@@ -26,9 +26,7 @@
                 <StackPanel>
                     <TextBlock Text="Authentication" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
 
-                    <CheckBox x:Name="UseWindowsAuthCheckBox" Content="Use Windows Authentication" Foreground="{StaticResource TextPrimaryBrush}" Checked="UseWindowsAuthCheckBox_Checked" Unchecked="UseWindowsAuthCheckBox_Checked"/>
-
-                    <Grid Margin="0,12,0,0">
+                    <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>

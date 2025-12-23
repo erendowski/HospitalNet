@@ -1,5 +1,5 @@
-/*
-HospitalNet � Admin vs Normal Users (SQL Logins + DB Roles + Stored Proc Permissions)
+﻿/*
+HospitalNet – Admin vs Normal Users (SQL Logins + DB Roles + Stored Proc Permissions)
 
 GOAL
 - Admin User:
@@ -201,10 +201,45 @@ END;
 GRANT EXECUTE ON OBJECT::dbo.sp_CreateDoctor      TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_CreatePatient     TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_CreateAppointment TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_UpdateDoctor      TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_UpdatePatient     TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_UpdateMedicalRecord TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_SetPatientActiveStatus TO HospitalAdminRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_SearchPatientsByName TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientByPhoneNumber TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientVisitHistory TO HospitalAdminRole;
+
 GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorByLicenseNumber TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetAllActiveDoctors TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorsBySpecialization TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorSchedule  TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorById  TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorAppointmentCount TO HospitalAdminRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientById  TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAllActivePatients TO HospitalAdminRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_CancelAppointment TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CheckDoctorAvailability TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAppointmentById TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CompleteAppointment TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientAppointments TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAvailableTimeSlots TO HospitalAdminRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_RecordMedicalVisit TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetMedicalRecordById TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientMedicalRecords TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorMedicalRecords TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetMedicalRecordByAppointmentId TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetFollowUpRequiredRecords TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetOverdueFollowUps TO HospitalAdminRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAppointmentStatistics TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorPerformanceMetrics TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientLoadStatistics TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetSpecializationStatistics TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPeakAppointmentTimes TO HospitalAdminRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDashboardMetrics TO HospitalAdminRole;
 
 GRANT ALTER ON OBJECT::dbo.sp_CreateDoctor      TO HospitalAdminRole;
 GRANT ALTER ON OBJECT::dbo.sp_CreatePatient     TO HospitalAdminRole;
@@ -215,10 +250,46 @@ GO
 -- Normal role: 
 GRANT EXECUTE ON OBJECT::dbo.sp_CreatePatient     TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_CreateAppointment TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_UpdatePatient     TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_UpdateMedicalRecord TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_SetPatientActiveStatus TO HospitalUserRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_SearchPatientsByName TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientByPhoneNumber TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientVisitHistory TO HospitalUserRole;
+
 GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorByLicenseNumber TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetAllActiveDoctors TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorsBySpecialization TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorSchedule  TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorById  TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorAppointmentCount TO HospitalUserRole;
 GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientById  TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAllActivePatients TO HospitalUserRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_CancelAppointment TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CheckDoctorAvailability TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAppointmentById TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_CompleteAppointment TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientAppointments TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAvailableTimeSlots TO HospitalUserRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_RecordMedicalVisit TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetMedicalRecordById TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientMedicalRecords TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorMedicalRecords TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetMedicalRecordByAppointmentId TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetFollowUpRequiredRecords TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetOverdueFollowUps TO HospitalUserRole;
+
+GRANT EXECUTE ON OBJECT::dbo.sp_GetAppointmentStatistics TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDoctorPerformanceMetrics TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPatientLoadStatistics TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetSpecializationStatistics TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetPeakAppointmentTimes TO HospitalUserRole;
+GRANT EXECUTE ON OBJECT::dbo.sp_GetDashboardMetrics TO HospitalUserRole;
 DENY  EXECUTE ON OBJECT::dbo.sp_CreateDoctor      TO HospitalUserRole;
+DENY  EXECUTE ON OBJECT::dbo.sp_UpdateDoctor      TO HospitalUserRole;
 
 GRANT ALTER ON OBJECT::dbo.sp_CreatePatient     TO HospitalUserRole;
 GRANT ALTER ON OBJECT::dbo.sp_CreateAppointment TO HospitalUserRole;

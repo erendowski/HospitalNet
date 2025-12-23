@@ -50,7 +50,10 @@ namespace HospitalNet.Backend.BusinessLogic
                 {
                     DatabaseHelper.CreateInputParameter("@FirstName", patient.FirstName),
                     DatabaseHelper.CreateInputParameter("@LastName", patient.LastName),
-                    DatabaseHelper.CreateInputParameter("@DateOfBirth", patient.DateOfBirth),
+                    DatabaseHelper.CreateInputParameter(
+                        "@DateOfBirth",
+                        SqlDbType.Date,
+                        patient.DateOfBirth == DateTime.MinValue ? DBNull.Value : patient.DateOfBirth),
                     DatabaseHelper.CreateInputParameter("@Gender", patient.Gender),
                     DatabaseHelper.CreateInputParameter("@PhoneNumber", patient.PhoneNumber),
                     DatabaseHelper.CreateInputParameter("@Email", patient.Email),
@@ -59,6 +62,7 @@ namespace HospitalNet.Backend.BusinessLogic
                     DatabaseHelper.CreateInputParameter("@PostalCode", patient.PostalCode),
                     DatabaseHelper.CreateInputParameter("@InsuranceProviderID", patient.InsuranceProviderID),
                     DatabaseHelper.CreateInputParameter("@MedicalHistorySummary", patient.MedicalHistorySummary ?? ""),
+                    DatabaseHelper.CreateInputParameter("@Allergies", SqlDbType.NVarChar, patient.Allergies ?? string.Empty, size: 4000),
                     DatabaseHelper.CreateInputParameter("@IsActive", patient.IsActive),
                     DatabaseHelper.CreateOutputParameter("@PatientID", SqlDbType.Int)
                 };
@@ -116,10 +120,13 @@ namespace HospitalNet.Backend.BusinessLogic
                         PostalCode = DatabaseHelper.GetStringValue(reader, "PostalCode"),
                         InsuranceProviderID = DatabaseHelper.GetIntValue(reader, "InsuranceProviderID"),
                         MedicalHistorySummary = DatabaseHelper.GetStringValue(reader, "MedicalHistorySummary"),
+                        Allergies = DatabaseHelper.GetStringValue(reader, "Allergies"),
                         IsActive = DatabaseHelper.GetBoolValue(reader, "IsActive"),
                         CreatedDate = DatabaseHelper.GetDateTimeValue(reader, "CreatedDate"),
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate"),
-                        LastVisitDate = DatabaseHelper.GetDateTimeValue(reader, "LastVisitDate")
+                        LastVisitDate = reader.IsDBNull(reader.GetOrdinal("LastVisitDate"))
+                            ? null
+                            : reader.GetDateTime(reader.GetOrdinal("LastVisitDate"))
                     },
                     parameters);
 
@@ -159,10 +166,13 @@ namespace HospitalNet.Backend.BusinessLogic
                         PostalCode = DatabaseHelper.GetStringValue(reader, "PostalCode"),
                         InsuranceProviderID = DatabaseHelper.GetIntValue(reader, "InsuranceProviderID"),
                         MedicalHistorySummary = DatabaseHelper.GetStringValue(reader, "MedicalHistorySummary"),
+                        Allergies = DatabaseHelper.GetStringValue(reader, "Allergies"),
                         IsActive = DatabaseHelper.GetBoolValue(reader, "IsActive"),
                         CreatedDate = DatabaseHelper.GetDateTimeValue(reader, "CreatedDate"),
                         UpdatedDate = DatabaseHelper.GetDateTimeValue(reader, "UpdatedDate"),
-                        LastVisitDate = DatabaseHelper.GetDateTimeValue(reader, "LastVisitDate")
+                        LastVisitDate = reader.IsDBNull(reader.GetOrdinal("LastVisitDate"))
+                            ? null
+                            : reader.GetDateTime(reader.GetOrdinal("LastVisitDate"))
                     });
 
                 return patients;
@@ -399,7 +409,10 @@ namespace HospitalNet.Backend.BusinessLogic
                     DatabaseHelper.CreateInputParameter("@PatientID", patient.PatientID),
                     DatabaseHelper.CreateInputParameter("@FirstName", patient.FirstName),
                     DatabaseHelper.CreateInputParameter("@LastName", patient.LastName),
-                    DatabaseHelper.CreateInputParameter("@DateOfBirth", patient.DateOfBirth),
+                    DatabaseHelper.CreateInputParameter(
+                        "@DateOfBirth",
+                        SqlDbType.Date,
+                        patient.DateOfBirth == DateTime.MinValue ? DBNull.Value : patient.DateOfBirth),
                     DatabaseHelper.CreateInputParameter("@Gender", patient.Gender),
                     DatabaseHelper.CreateInputParameter("@PhoneNumber", patient.PhoneNumber),
                     DatabaseHelper.CreateInputParameter("@Email", patient.Email),
@@ -408,6 +421,8 @@ namespace HospitalNet.Backend.BusinessLogic
                     DatabaseHelper.CreateInputParameter("@PostalCode", patient.PostalCode),
                     DatabaseHelper.CreateInputParameter("@InsuranceProviderID", patient.InsuranceProviderID),
                     DatabaseHelper.CreateInputParameter("@MedicalHistorySummary", patient.MedicalHistorySummary ?? ""),
+                    DatabaseHelper.CreateInputParameter("@Allergies", SqlDbType.NVarChar, patient.Allergies ?? string.Empty, size: 4000),
+                    DatabaseHelper.CreateInputParameter("@LastVisitDate", SqlDbType.DateTime2, patient.LastVisitDate.HasValue ? (object)patient.LastVisitDate.Value : DBNull.Value),
                     DatabaseHelper.CreateInputParameter("@IsActive", patient.IsActive)
                 };
 

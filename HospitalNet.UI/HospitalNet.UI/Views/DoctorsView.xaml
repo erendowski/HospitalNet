@@ -77,20 +77,6 @@
                             <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <DataGridTextColumn Header="Salary" Binding="{Binding Salary, StringFormat=₺{0:N2}}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <DataGridTextColumn Header="Experience" Binding="{Binding YearsOfExperience}" Width="80" Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <DataGridTemplateColumn Header="Actions" Width="150">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                            <Button Width="40" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="EditDoctor_Click" Tag="{Binding DoctorID}" ToolTip="Edit" Cursor="Hand">
-                                                <TextBlock Text="&#xE70F;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Button>
-                                            <Button Width="40" Height="28" Margin="2" Style="{StaticResource SecondaryButtonStyle}" Click="DeleteDoctor_Click" Tag="{Binding DoctorID}" ToolTip="Delete" Cursor="Hand">
-                                                <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </Button>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -98,9 +84,10 @@
 
             <!-- Doctor Details & Appointments Panel -->
             <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer x:Name="DetailsScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid>
                         <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -110,118 +97,165 @@
 
                     <TextBlock Grid.Row="0" Text="Doctor Details" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="15,15,15,10"/>
 
+                    <!-- Add Doctor Screen (inline) -->
+                    <Border Grid.Row="1" x:Name="AddDoctorPanel" Visibility="Collapsed" Margin="15,0,15,15" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Add Doctor" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+
+                            <UniformGrid Columns="2" Rows="5">
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                                    <StackPanel>
+                                        <TextBlock Text="First Name" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorFirstNameTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Last Name" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorLastNameTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Specialization" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorSpecializationTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0" Text="General Practice"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="License Number" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorLicenseTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Phone" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorPhoneTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Email" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorEmailTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Office" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorOfficeTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Years of Experience" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorYearsTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0" Text="0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,10,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Max Patients/Day" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorMaxPatientsTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0" Text="20"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Active" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6"/>
+                                        <CheckBox x:Name="NewDoctorIsActiveCheckBox" IsChecked="True" Content="Yes" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Salary" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBox x:Name="NewDoctorSalaryTextBox" Style="{StaticResource StandardTextBoxStyle}" Height="32" Margin="0,6,0,0" Text="0"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Cancel" Width="80" Height="32" Style="{StaticResource SecondaryButtonStyle}" Click="CancelAddDoctor_Click" Cursor="Hand" Margin="10,18,0,0"/>
+                                    <Button Grid.Column="2" Content="Save" Width="80" Height="32" Style="{StaticResource PrimaryButtonStyle}" Click="SaveAddDoctor_Click" Cursor="Hand" Margin="10,18,0,0"/>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Doctor Info Card -->
-                    <Border Grid.Row="1" Margin="15,0,15,15" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15">
+                    <Border Grid.Row="2" Margin="15,0,15,15" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15">
                         <StackPanel x:Name="DoctorDetailsPanel">
                             <TextBlock x:Name="DoctorNameTextBlock" Text="Select a doctor" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                             <TextBlock x:Name="DoctorSpecTextBlock" Text="" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"/>
                             
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,8">
-                                    <TextBlock Text="Email:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock x:Name="DoctorEmailTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,8">
-                                    <TextBlock Text="Phone:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock x:Name="DoctorPhoneTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,0,8">
-                                    <TextBlock Text="Office:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock x:Name="DoctorOfficeTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
-                                    <TextBlock Text="Salary:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock x:Name="DoctorSalaryTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="2" Grid.Column="0">
-                                    <TextBlock Text="Experience:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock x:Name="DoctorExperienceTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="2" Grid.Column="1">
-                                    <TextBlock Text="Max Patients/Day:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                    <TextBlock x:Name="DoctorMaxPatientsTextBlock" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                </StackPanel>
-                            </Grid>
+                            <UniformGrid Columns="2" Rows="3">
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Email" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock x:Name="DoctorEmailTextBlock" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Phone" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock x:Name="DoctorPhoneTextBlock" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Office" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock x:Name="DoctorOfficeTextBlock" Text="-" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="Salary" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock x:Name="DoctorSalaryTextBlock" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Experience" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock x:Name="DoctorExperienceTextBlock" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Max Patients/Day" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        <TextBlock x:Name="DoctorMaxPatientsTextBlock" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
                         </StackPanel>
                     </Border>
 
                     <!-- Appointments Header -->
-                    <Grid Grid.Row="2" Margin="15,0,15,10">
+                    <Grid Grid.Row="3" Margin="15,0,15,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Column="0" Text="Appointments" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                        <Button Grid.Column="2" x:Name="AddAppointmentButton" Width="85" Height="28" Style="{StaticResource PrimaryButtonStyle}" Click="AddAppointmentButton_Click" Cursor="Hand" ToolTip="Add new appointment">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="11" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBlock Text="New" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                            <TextBlock Text="Date:" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <DatePicker x:Name="AppointmentsDateFilterPicker" Width="130" Height="28" VerticalAlignment="Center" SelectedDateChanged="AppointmentsDateFilterPicker_SelectedDateChanged"/>
+                        </StackPanel>
                     </Grid>
 
-                    <!-- New Appointment Form (hidden by default) -->
-                    <Border Grid.Row="3" x:Name="NewAppointmentPanel" Visibility="Collapsed" Margin="15,0,15,10" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10">
+                    <!-- Selected Appointment Details -->
+                    <Border Grid.Row="4" Margin="15,0,15,10" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12">
                         <StackPanel>
-                            <TextBlock Text="New Appointment" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
-                            
-                            <TextBlock Text="Patient:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
-                            <ComboBox x:Name="PatientComboBox" Height="30" Margin="0,0,0,8" DisplayMemberPath="FullName" SelectedValuePath="PatientID"/>
-
-                            <Grid Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Date:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
-                                    <DatePicker x:Name="AppointmentDatePicker" Height="30"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Text="Time (HH:mm):" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
-                                    <TextBox x:Name="AppointmentTimeTextBox" Height="30" Padding="8,0" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Text="09:00"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="4">
-                                    <TextBlock Text="Duration (min):" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
-                                    <TextBox x:Name="DurationTextBox" Height="30" Padding="8,0" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Text="30"/>
-                                </StackPanel>
-                            </Grid>
-
-                            <TextBlock Text="Reason:" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,3"/>
-                            <TextBox x:Name="ReasonTextBox" Height="50" Padding="8,5" TextWrapping="Wrap" Style="{StaticResource StandardTextBoxStyle}" Margin="0,0,0,10"/>
-
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="Cancel" Width="70" Height="28" Style="{StaticResource SecondaryButtonStyle}" Click="CancelAppointmentForm_Click" Cursor="Hand" Margin="0,0,8,0"/>
-                                <Button Content="Book" Width="70" Height="28" Style="{StaticResource PrimaryButtonStyle}" Click="BookAppointment_Click" Cursor="Hand"/>
-                            </StackPanel>
+                            <TextBlock Text="Selected Appointment" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                            <TextBlock x:Name="SelectedAppointmentSummaryText" Text="-" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
 
                     <!-- Appointments List -->
-                    <DataGrid Grid.Row="4" x:Name="AppointmentsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" ColumnHeaderHeight="35" Margin="15,0,15,15">
+                    <DataGrid Grid.Row="5" x:Name="AppointmentsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" ColumnHeaderHeight="35" Margin="15,0,15,15" SelectionChanged="AppointmentsDataGrid_SelectionChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Time" Binding="{Binding AppointmentTime, StringFormat=HH:mm}" Width="60" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <DataGridTextColumn Header="Patient" Binding="{Binding PatientName}" Width="100" Foreground="{StaticResource TextPrimaryBrush}"/>

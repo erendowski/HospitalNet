@@ -1,10 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using HospitalNet.Backend.BusinessLogic;
 using HospitalNet.Backend.Infrastructure;
+using HospitalNet.Backend.Models;
 
 namespace HospitalNet.UI.Views
 {
@@ -13,6 +15,13 @@ namespace HospitalNet.UI.Views
     /// </summary>
     public partial class DashboardView : UserControl
     {
+        private sealed class DashboardBarItem
+        {
+            public string Label { get; set; }
+            public string CountText { get; set; }
+            public double Fraction { get; set; }
+        }
+
         private sealed class AppointmentCardItem
         {
             public int AppointmentID { get; set; }
@@ -29,12 +38,10 @@ namespace HospitalNet.UI.Views
         private PatientManager _patientManager;
         private AppointmentManager _appointmentManager;
         private DispatcherTimer _refreshTimer;
-        private DateTime _selectedDate;
 
         public DashboardView()
         {
             InitializeComponent();
-            _selectedDate = DateTime.Today;
 
             if (App.OfflineMode)
             {
@@ -50,7 +57,6 @@ namespace HospitalNet.UI.Views
                 return;
             }
 
-            AppointmentDatePicker.SelectedDate = _selectedDate;
             LoadDashboardData();
             StartAutoRefresh();
         }
@@ -94,6 +100,9 @@ namespace HospitalNet.UI.Views
 
                 DateTimeTextBlock.Text = DateTime.Now.ToString("dddd, MMMM d, yyyy - h:mm tt");
 
+                var doctorsById = new System.Collections.Generic.Dictionary<int, Doctor>();
+                var patientsById = new System.Collections.Generic.Dictionary<int, Patient>();
+
                 // Always compute metrics for today
                 var todayAppointments = _appointmentManager.GetAppointmentsByDate(DateTime.Today);
                 int completedToday = 0;
@@ -106,17 +115,88 @@ namespace HospitalNet.UI.Views
                 TodayAppointmentsMetric.Text = todayAppointments.Count.ToString();
                 CompletedTodayMetric.Text = completedToday.ToString();
 
-                // Load appointments for the currently selected date into the cards list
-                var selectedAppointments = _selectedDate.Date == DateTime.Today
-                    ? todayAppointments
-                    : _appointmentManager.GetAppointmentsByDate(_selectedDate.Date);
+                try
+                {
+                    var doctors = _doctorManager.GetAllDoctors();
+                    ActiveDoctorsMetric.Text = doctors.Count.ToString();
+                    foreach (var doctor in doctors)
+                    {
+                        doctorsById[doctor.DoctorID] = doctor;
+                    }
+
+                    // Doctors by specialization (top 6)
+                    var specializationGroups = doctors
+                        .GroupBy(d => string.IsNullOrWhiteSpace(d.Specialization) ? "Unspecified" : d.Specialization.Trim())
+                        .Select(g => new { Label = g.Key, Count = g.Count() })
+                        .OrderByDescending(x => x.Count)
+                        .Take(6)
+                        .ToList();
+
+                    int specTotal = specializationGroups.Sum(x => x.Count);
+                    DoctorsBySpecializationItems.ItemsSource = specializationGroups.Select(x => new DashboardBarItem
+                    {
+                        Label = x.Label,
+                        CountText = x.Count.ToString(),
+                        Fraction = specTotal == 0 ? 0 : (double)x.Count / specTotal
+                    }).ToList();
+                }
+                catch
+                {
+                    ActiveDoctorsMetric.Text = "N/A";
+                    DoctorsBySpecializationItems.ItemsSource = null;
+                }
+
+                try
+                {
+                    var patients = _patientManager.GetAllActivePatients();
+                    TotalPatientsMetric.Text = patients.Count.ToString();
+                    foreach (var patient in patients)
+                    {
+                        patientsById[patient.PatientID] = patient;
+                    }
+
+                    // Patients by gender
+                    var genderGroups = patients
+                        .GroupBy(p => string.IsNullOrWhiteSpace(p.Gender) ? "Unspecified" : p.Gender.Trim())
+                        .Select(g => new { Label = g.Key, Count = g.Count() })
+                        .OrderByDescending(x => x.Count)
+                        .ToList();
+
+                    int genderTotal = genderGroups.Sum(x => x.Count);
+                    PatientsByGenderItems.ItemsSource = genderGroups.Select(x => new DashboardBarItem
+                    {
+                        Label = x.Label,
+                        CountText = x.Count.ToString(),
+                        Fraction = genderTotal == 0 ? 0 : (double)x.Count / genderTotal
+                    }).ToList();
+                }
+                catch
+                {
+                    TotalPatientsMetric.Text = "N/A";
+                    PatientsByGenderItems.ItemsSource = null;
+                }
 
                 var displayAppointments = new ObservableCollection<AppointmentCardItem>();
 
-                foreach (var apt in selectedAppointments)
+                foreach (var apt in todayAppointments)
                 {
-                    var doctor = _doctorManager.GetDoctorByID(apt.DoctorID);
-                    var patient = _patientManager.GetPatientByID(apt.PatientID);
+                    if (!doctorsById.TryGetValue(apt.DoctorID, out var doctor))
+                    {
+                        doctor = _doctorManager.GetDoctorByID(apt.DoctorID);
+                        if (doctor != null)
+                        {
+                            doctorsById[doctor.DoctorID] = doctor;
+                        }
+                    }
+
+                    if (!patientsById.TryGetValue(apt.PatientID, out var patient))
+                    {
+                        patient = _patientManager.GetPatientByID(apt.PatientID);
+                        if (patient != null)
+                        {
+                            patientsById[patient.PatientID] = patient;
+                        }
+                    }
 
                     string doctorName = doctor != null ? $"Dr. {doctor.FirstName} {doctor.LastName}" : "Unknown";
                     string patientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown";
@@ -134,25 +214,20 @@ namespace HospitalNet.UI.Views
 
                 TodayAppointmentsItems.ItemsSource = displayAppointments;
 
-                try
-                {
-                    var doctors = _doctorManager.GetAllDoctors();
-                    ActiveDoctorsMetric.Text = doctors.Count.ToString();
-                }
-                catch
-                {
-                    ActiveDoctorsMetric.Text = "N/A";
-                }
+                // Appointments by status (today)
+                var statusGroups = todayAppointments
+                    .GroupBy(a => string.IsNullOrWhiteSpace(a.Status) ? "Unknown" : a.Status.Trim())
+                    .Select(g => new { Label = g.Key, Count = g.Count() })
+                    .OrderByDescending(x => x.Count)
+                    .ToList();
 
-                try
+                int statusTotal = statusGroups.Sum(x => x.Count);
+                AppointmentsByStatusItems.ItemsSource = statusGroups.Select(x => new DashboardBarItem
                 {
-                    var patients = _patientManager.GetAllActivePatients();
-                    TotalPatientsMetric.Text = patients.Count.ToString();
-                }
-                catch
-                {
-                    TotalPatientsMetric.Text = "N/A";
-                }
+                    Label = x.Label,
+                    CountText = x.Count.ToString(),
+                    Fraction = statusTotal == 0 ? 0 : (double)x.Count / statusTotal
+                }).ToList();
 
                 StatusTextBlock.Text = $"Updated at {DateTime.Now:HH:mm:ss}";
             }
@@ -174,15 +249,6 @@ namespace HospitalNet.UI.Views
             _refreshTimer?.Stop();
         }
 
-        private void AppointmentDatePicker_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (AppointmentDatePicker.SelectedDate.HasValue)
-            {
-                _selectedDate = AppointmentDatePicker.SelectedDate.Value.Date;
-                LoadDashboardData();
-            }
-        }
-
         private void SetOfflineState(string statusMessage)
         {
             _doctorManager = null;
@@ -190,6 +256,9 @@ namespace HospitalNet.UI.Views
             _appointmentManager = null;
 
             TodayAppointmentsItems.ItemsSource = null;
+            PatientsByGenderItems.ItemsSource = null;
+            DoctorsBySpecializationItems.ItemsSource = null;
+            AppointmentsByStatusItems.ItemsSource = null;
             TodayAppointmentsMetric.Text = "-";
             CompletedTodayMetric.Text = "-";
             ActiveDoctorsMetric.Text = "-";

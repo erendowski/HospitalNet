@@ -5,7 +5,6 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Security.Principal;
 using System.Windows;
 
 namespace HospitalNet.UI
@@ -57,10 +56,8 @@ namespace HospitalNet.UI
                 ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
                 var baseConnectionString = GetConnectionString();
-                var baseBuilder = new SqlConnectionStringBuilder(baseConnectionString);
-                bool defaultWindowsAuth = baseBuilder.IntegratedSecurity;
 
-                var loginWindow = new LoginWindow(baseConnectionString, defaultWindowsAuth);
+                var loginWindow = new LoginWindow(baseConnectionString);
                 bool? loginResult = loginWindow.ShowDialog();
                 if (loginResult != true || string.IsNullOrWhiteSpace(loginWindow.EffectiveConnectionString))
                 {
@@ -86,9 +83,9 @@ namespace HospitalNet.UI
                     return;
                 }
 
-                var signedInName = loginWindow.SignedInUsername
-                    ?? WindowsIdentity.GetCurrent().Name
-                    ?? "Unknown";
+                var signedInName = string.IsNullOrWhiteSpace(loginWindow.SignedInUsername)
+                    ? "Unknown"
+                    : loginWindow.SignedInUsername;
 
                 bool isAdmin = false;
                 foreach (var roleName in AdminDbRoleNames)

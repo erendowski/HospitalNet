@@ -280,11 +280,16 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE dbo.sp_GetDoctorAppointmentCount @DoctorId INT
+CREATE OR ALTER PROCEDURE dbo.sp_GetDoctorAppointmentCount
+    @DoctorId INT,
+    @AppointmentDate DATE = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT COUNT(*) AS AppointmentCount FROM dbo.Appointments WHERE DoctorID=@DoctorId;
+    SELECT COUNT(*) AS AppointmentCount
+    FROM dbo.Appointments
+    WHERE DoctorID=@DoctorId
+      AND (@AppointmentDate IS NULL OR CAST(AppointmentDateTime AS DATE) = @AppointmentDate);
 END
 GO
 

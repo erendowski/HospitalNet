@@ -325,6 +325,33 @@ namespace HospitalNet.Backend.Infrastructure
         }
 
         /// <summary>
+        /// Helper method to create a typed SqlParameter for input parameters.
+        /// Prefer this overload for Date/DateTime to avoid SqlDateTime overflow (pre-1753) and to control coercion.
+        /// </summary>
+        public static SqlParameter CreateInputParameter(string parameterName, SqlDbType sqlType, object value, int size = -1)
+        {
+            var param = new SqlParameter
+            {
+                ParameterName = parameterName,
+                SqlDbType = sqlType,
+                Value = value ?? DBNull.Value,
+                Direction = ParameterDirection.Input
+            };
+
+            if (size > 0)
+            {
+                param.Size = size;
+            }
+            else if (sqlType == SqlDbType.NVarChar || sqlType == SqlDbType.VarChar || sqlType == SqlDbType.NChar || sqlType == SqlDbType.Char)
+            {
+                // Keep consistent with CreateOutputParameter default behavior.
+                param.Size = 4000;
+            }
+
+            return param;
+        }
+
+        /// <summary>
         /// Helper method to create a SqlParameter for output parameters
         /// </summary>
         /// <param name="parameterName">Parameter name (e.g., "@AppointmentID")</param>

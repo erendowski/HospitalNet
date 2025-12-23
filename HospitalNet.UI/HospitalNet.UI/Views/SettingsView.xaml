@@ -22,13 +22,13 @@
             <StackPanel Orientation="Vertical" Background="Transparent">
                 <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,20">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="🗄️ Database Connection" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="Database Connection" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
 
                         <TextBlock Text="Connection String:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                         <TextBox x:Name="ConnectionStringTextBox" Height="80" Padding="10,10,10,10" VerticalAlignment="Top" VerticalContentAlignment="Top" TextWrapping="Wrap" Style="{StaticResource StandardTextBoxStyle}" Foreground="{StaticResource TextPrimaryBrush}" IsReadOnly="True" Background="#F5F5F5" Margin="0,0,0,15"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                            <Button x:Name="TestConnectionButton" Content="🔌 Test Connection" Width="140" Height="35" Style="{StaticResource PrimaryButtonStyle}" Click="TestConnectionButton_Click" Cursor="Hand" Margin="0,0,10,0"/>
+                            <Button x:Name="TestConnectionButton" Content="Test Connection" Width="140" Height="35" Style="{StaticResource PrimaryButtonStyle}" Click="TestConnectionButton_Click" Cursor="Hand" Margin="0,0,10,0"/>
                             <TextBlock x:Name="ConnectionStatusTextBlock" Text="Status: Unknown" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
@@ -36,7 +36,7 @@
 
                 <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,20">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="⚙️ Application Preferences" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="Application Preferences" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
                             <CheckBox x:Name="AutoRefreshCheckBox" IsChecked="True" VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -55,7 +55,7 @@
 
                 <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="20" Margin="0,0,0,0">
                     <StackPanel Orientation="Vertical">
-                        <TextBlock Text="ℹ️ About HospitalNet" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="About HospitalNet" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
 
                         <TextBlock Text="Application:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                         <TextBlock Text="HospitalNet - Hospital Management System" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
@@ -66,7 +66,7 @@
                         <TextBlock Text="Database:" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                         <TextBlock x:Name="DatabaseVersionTextBlock" Text="Loading..." Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
 
-                        <TextBlock Text="Copyright © 2025 HospitalNet. All rights reserved." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,0"/>
+                        <TextBlock Text="Copyright (c) 2025 HospitalNet. All rights reserved." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,0"/>
                     </StackPanel>
                 </Border>
             </StackPanel>

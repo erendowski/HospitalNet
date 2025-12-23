@@ -112,6 +112,9 @@ namespace HospitalNet.UI.Views
 
         private string TrimConnectionString(string connectionString)
         {
+            if (string.IsNullOrWhiteSpace(connectionString))
+                return "-";
+
             return connectionString.Length > 50 ? connectionString[..50] + "..." : connectionString;
         }
     }

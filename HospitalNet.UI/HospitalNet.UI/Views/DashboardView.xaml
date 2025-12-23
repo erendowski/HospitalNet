@@ -12,6 +12,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -57,27 +58,104 @@
             </Border>
         </StackPanel>
 
+        <!-- Analytics Widgets -->
+        <Grid Grid.Row="2" Margin="20,0,20,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Row="0" Grid.Column="0" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Patients by Gender" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                    <ItemsControl x:Name="PatientsByGenderItems">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CountText}" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                    <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="10" Maximum="1" Value="{Binding Fraction}" Margin="0,6,0,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="0" Grid.Column="2" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="Doctors by Specialization" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                    <ItemsControl x:Name="DoctorsBySpecializationItems">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CountText}" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                    <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="10" Maximum="1" Value="{Binding Fraction}" Margin="0,6,0,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="1" Grid.ColumnSpan="3" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="16" Margin="0,20,0,0">
+                <StackPanel>
+                    <TextBlock Text="Today's Appointments by Status" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                    <ItemsControl x:Name="AppointmentsByStatusItems">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Label}" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CountText}" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                    <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="10" Maximum="1" Value="{Binding Fraction}" Margin="0,6,0,0"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </Grid>
+
         <!-- Today's Appointments List -->
-        <Border Grid.Row="2" Margin="20,0,20,20" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+        <Border Grid.Row="3" Margin="20,0,20,20" Background="{StaticResource SurfaceColor}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header with Date Picker -->
                 <Grid Grid.Row="0" Margin="20,15,20,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <TextBlock Grid.Column="0" Text="Appointments" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
-                    
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="Select Date:" FontSize="{StaticResource FontSizeNormal}" Foreground="{StaticResource TextSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <DatePicker x:Name="AppointmentDatePicker" Width="150" Height="35" VerticalAlignment="Center" SelectedDateChanged="AppointmentDatePicker_SelectedDateChanged"/>
-                    </StackPanel>
+                    <TextBlock Text="Today's Appointments" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- Appointment cards (no table) -->
@@ -116,7 +194,7 @@
         </Border>
 
         <!-- Status Bar -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">
             <TextBlock x:Name="StatusTextBlock" Text="Loading dashboard..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>

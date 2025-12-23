@@ -344,6 +344,7 @@ namespace HospitalNet.Backend.BusinessLogic
                 var parameters = new[]
                 {
                     DatabaseHelper.CreateInputParameter("@DoctorID", doctorId),
+                    // Stored procedure expects DATE for filtering by a specific day.
                     DatabaseHelper.CreateInputParameter("@AppointmentDate", appointmentDate.Date)
                 };
 

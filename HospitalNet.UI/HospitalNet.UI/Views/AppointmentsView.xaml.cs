@@ -13,11 +13,25 @@ namespace HospitalNet.UI.Views
     /// </summary>
     public partial class AppointmentsView : UserControl
     {
+        private sealed class AppointmentDisplayRow
+        {
+            public int AppointmentID { get; set; }
+            public int PatientID { get; set; }
+            public int DoctorID { get; set; }
+            public DateTime AppointmentTime { get; set; }
+            public string PatientName { get; set; }
+            public string ReasonForVisit { get; set; }
+            public string Status { get; set; }
+        }
+
         private DoctorManager _doctorManager;
         private PatientManager _patientManager;
         private AppointmentManager _appointmentManager;
         private Doctor _selectedDoctor;
+        private Patient _selectedPatient;
+        private AppointmentDisplayRow _selectedAppointmentRow;
         private DateTime _selectedDate;
+        private readonly System.Collections.Generic.Dictionary<int, Patient> _patientsById = new System.Collections.Generic.Dictionary<int, Patient>();
 
         public AppointmentsView()
         {
@@ -25,6 +39,10 @@ namespace HospitalNet.UI.Views
             if (App.OfflineMode)
             {
                 AppointmentsDataGrid.ItemsSource = null;
+                BookButton.IsEnabled = false;
+                SetSelectedDoctor(null);
+                SetSelectedPatient(null);
+                SetSelectedAppointmentRow(null);
                 return;
             }
 
@@ -32,6 +50,30 @@ namespace HospitalNet.UI.Views
             LoadDoctors();
             LoadPatients();
             DatePicker.SelectedDate = DateTime.Today;
+        }
+
+        private void SetSelectedDoctor(Doctor doctor)
+        {
+            _selectedDoctor = doctor;
+            SelectedDoctorText.Text = doctor != null ? $"Dr. {doctor.FullName} ({doctor.Specialization})" : "-";
+        }
+
+        private void SetSelectedPatient(Patient patient)
+        {
+            _selectedPatient = patient;
+            SelectedPatientText.Text = patient != null ? $"{patient.FullName} (ID: {patient.PatientID})" : "-";
+        }
+
+        private void SetSelectedAppointmentRow(AppointmentDisplayRow row)
+        {
+            _selectedAppointmentRow = row;
+            if (row == null)
+            {
+                SelectedAppointmentText.Text = "-";
+                return;
+            }
+
+            SelectedAppointmentText.Text = $"#{row.AppointmentID} • {row.AppointmentTime:g} • {row.Status}\n{row.PatientName}\n{row.ReasonForVisit}";
         }
 
         private void InitializeManagers()
@@ -52,18 +94,21 @@ namespace HospitalNet.UI.Views
                     _doctorManager = null;
                     _patientManager = null;
                     _appointmentManager = null;
+                    BookButton.IsEnabled = false;
                     return;
                 }
 
                 _doctorManager = new DoctorManager(App.ConnectionString);
                 _patientManager = new PatientManager(App.ConnectionString);
                 _appointmentManager = new AppointmentManager(App.ConnectionString);
+                BookButton.IsEnabled = true;
             }
             catch (Exception)
             {
                 _doctorManager = null;
                 _patientManager = null;
                 _appointmentManager = null;
+                BookButton.IsEnabled = false;
             }
         }
 
@@ -97,11 +142,18 @@ namespace HospitalNet.UI.Views
                 if (_patientManager == null)
                 {
                     PatientComboBox.ItemsSource = null;
+                    _patientsById.Clear();
                     return;
                 }
 
                 var patients = _patientManager.GetAllActivePatients();
                 PatientComboBox.ItemsSource = new ObservableCollection<Patient>(patients);
+
+                _patientsById.Clear();
+                foreach (var patient in patients)
+                {
+                    _patientsById[patient.PatientID] = patient;
+                }
                 if (patients.Count > 0)
                 {
                     PatientComboBox.SelectedIndex = 0;
@@ -110,6 +162,7 @@ namespace HospitalNet.UI.Views
             catch (Exception)
             {
                 PatientComboBox.ItemsSource = null;
+                _patientsById.Clear();
             }
         }
 
@@ -117,8 +170,9 @@ namespace HospitalNet.UI.Views
         {
             if (DoctorComboBox.SelectedItem is Doctor doctor)
             {
-                _selectedDoctor = doctor;
+                SetSelectedDoctor(doctor);
                 RefreshAppointmentsList();
+                SetSelectedAppointmentRow(null);
             }
         }
 
@@ -128,6 +182,7 @@ namespace HospitalNet.UI.Views
             {
                 _selectedDate = DatePicker.SelectedDate.Value;
                 RefreshAppointmentsList();
+                SetSelectedAppointmentRow(null);
             }
         }
 
@@ -148,15 +203,24 @@ namespace HospitalNet.UI.Views
                     _selectedDoctor.DoctorID,
                     _selectedDate);
 
-                var displayAppointments = new ObservableCollection<dynamic>();
+                var displayAppointments = new ObservableCollection<AppointmentDisplayRow>();
                 foreach (var apt in appointments)
                 {
-                    var patient = _patientManager.GetPatientByID(apt.PatientID);
+                    if (!_patientsById.TryGetValue(apt.PatientID, out var patient))
+                    {
+                        patient = _patientManager.GetPatientByID(apt.PatientID);
+                        if (patient != null)
+                        {
+                            _patientsById[patient.PatientID] = patient;
+                        }
+                    }
                     var patientName = patient != null ? $"{patient.FirstName} {patient.LastName}" : "Unknown";
 
-                    displayAppointments.Add(new
+                    displayAppointments.Add(new AppointmentDisplayRow
                     {
                         AppointmentID = apt.AppointmentID,
+                        DoctorID = apt.DoctorID,
+                        PatientID = apt.PatientID,
                         AppointmentTime = apt.AppointmentDateTime,
                         PatientName = patientName,
                         ReasonForVisit = apt.ReasonForVisit,
@@ -172,10 +236,47 @@ namespace HospitalNet.UI.Views
             }
         }
 
+        private void PatientComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PatientComboBox.SelectedItem is Patient patient)
+            {
+                SetSelectedPatient(patient);
+                return;
+            }
+
+            SetSelectedPatient(null);
+        }
+
+        private void AppointmentsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (AppointmentsDataGrid.SelectedItem is AppointmentDisplayRow row)
+            {
+                SetSelectedAppointmentRow(row);
+
+                if (_patientsById.TryGetValue(row.PatientID, out var patient))
+                {
+                    SetSelectedPatient(patient);
+                }
+                return;
+            }
+
+            SetSelectedAppointmentRow(null);
+        }
+
         private void BookButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+                if (_appointmentManager == null || _patientManager == null)
+                {
+                    MessageBox.Show(
+                        "Appointments are unavailable (offline or no database connection).",
+                        "Offline",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (_selectedDoctor == null)
                 {
                     MessageBox.Show("Please select a doctor.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -234,6 +335,7 @@ namespace HospitalNet.UI.Views
                     ReasonTextBox.Text = string.Empty;
 
                     RefreshAppointmentsList();
+                    SetSelectedAppointmentRow(null);
                 }
                 catch (Exception bookingException)
                 {

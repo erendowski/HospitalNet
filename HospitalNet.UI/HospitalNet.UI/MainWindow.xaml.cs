@@ -50,9 +50,9 @@ namespace HospitalNet.UI
 
             if (session != null && !session.IsAdmin)
             {
-                // Hide Doctors navigation and prevent navigation to Doctors view for normal users
-                DoctorsButton.Visibility = Visibility.Collapsed;
-                _views.Remove("Doctors");
+                // Normal users can view doctors, but cannot add/edit/deactivate doctors.
+                DoctorsButton.Visibility = Visibility.Visible;
+                DoctorsButton.ToolTip = "View doctors (admin required for doctor management actions)";
             }
         }
 

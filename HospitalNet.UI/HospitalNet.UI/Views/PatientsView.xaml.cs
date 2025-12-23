@@ -18,6 +18,7 @@ namespace HospitalNet.UI.Views
         private PatientManager _patientManager;
         private ObservableCollection<Patient> _allPatients = new ObservableCollection<Patient>();
         private ObservableCollection<Patient> _filteredPatients = new ObservableCollection<Patient>();
+        private Patient _selectedPatient;
 
         public PatientsView()
         {
@@ -27,10 +28,42 @@ namespace HospitalNet.UI.Views
                 PatientsDataGrid.ItemsSource = null;
                 StatusTextBlock.Text = "Patients offline (no database connection).";
                 CountTextBlock.Text = "Total: -";
+                AddPatientButton.IsEnabled = false;
                 return;
             }
 
             LoadPatients();
+        }
+
+        private void SetSelectedPatient(Patient patient)
+        {
+            _selectedPatient = patient;
+
+            if (patient == null)
+            {
+                SelectedPatientNameText.Text = "-";
+                SelectedPatientMetaText.Text = "-";
+                SelectedPatientPhoneText.Text = "-";
+                SelectedPatientEmailText.Text = "-";
+                SelectedPatientDobText.Text = "-";
+                SelectedPatientAgeText.Text = "-";
+                SelectedPatientGenderText.Text = "-";
+                SelectedPatientLastVisitText.Text = "-";
+                SelectedPatientAllergiesText.Text = "-";
+                SelectedPatientMedicalHistoryText.Text = "-";
+                return;
+            }
+
+            SelectedPatientNameText.Text = patient.FullName;
+            SelectedPatientMetaText.Text = $"ID: {patient.PatientID} • Active: {(patient.IsActive ? "Yes" : "No")}";
+            SelectedPatientPhoneText.Text = string.IsNullOrWhiteSpace(patient.Phone) ? "-" : patient.Phone;
+            SelectedPatientEmailText.Text = string.IsNullOrWhiteSpace(patient.Email) ? "-" : patient.Email;
+            SelectedPatientDobText.Text = patient.DateOfBirth == DateTime.MinValue ? "-" : patient.DateOfBirth.ToString("d");
+            SelectedPatientAgeText.Text = patient.DateOfBirth == DateTime.MinValue ? "-" : patient.Age.ToString();
+            SelectedPatientGenderText.Text = string.IsNullOrWhiteSpace(patient.Gender) ? "-" : patient.Gender;
+            SelectedPatientLastVisitText.Text = patient.LastVisitDate.HasValue ? patient.LastVisitDate.Value.ToString("g") : "-";
+            SelectedPatientAllergiesText.Text = string.IsNullOrWhiteSpace(patient.Allergies) ? "-" : patient.Allergies;
+            SelectedPatientMedicalHistoryText.Text = string.IsNullOrWhiteSpace(patient.MedicalHistorySummary) ? "-" : patient.MedicalHistorySummary;
         }
 
         private void LoadPatients()
@@ -43,6 +76,8 @@ namespace HospitalNet.UI.Views
                     PatientsDataGrid.ItemsSource = null;
                     StatusTextBlock.Text = "Patients offline (no database connection).";
                     CountTextBlock.Text = "Total: -";
+                    AddPatientButton.IsEnabled = false;
+                    SetSelectedPatient(null);
                     return;
                 }
 
@@ -52,6 +87,8 @@ namespace HospitalNet.UI.Views
                     PatientsDataGrid.ItemsSource = null;
                     StatusTextBlock.Text = "Patients offline (no active database connection).";
                     CountTextBlock.Text = "Total: -";
+                    AddPatientButton.IsEnabled = false;
+                    SetSelectedPatient(null);
                     return;
                 }
 
@@ -62,6 +99,8 @@ namespace HospitalNet.UI.Views
                     PatientsDataGrid.ItemsSource = null;
                     StatusTextBlock.Text = "Patients offline (no database connection).";
                     CountTextBlock.Text = "Total: -";
+                    AddPatientButton.IsEnabled = false;
+                    SetSelectedPatient(null);
                     return;
                 }
 
@@ -75,6 +114,8 @@ namespace HospitalNet.UI.Views
 
                 StatusTextBlock.Text = $"Loaded {patients.Count} active patients";
                 CountTextBlock.Text = $"Total: {patients.Count}";
+                AddPatientButton.IsEnabled = true;
+                SetSelectedPatient(null);
             }
             catch (Exception ex)
             {
@@ -82,6 +123,8 @@ namespace HospitalNet.UI.Views
                 PatientsDataGrid.ItemsSource = null;
                 StatusTextBlock.Text = $"Patients offline (data unavailable): {ex.Message}";
                 CountTextBlock.Text = "Total: -";
+                AddPatientButton.IsEnabled = false;
+                SetSelectedPatient(null);
             }
         }
 
@@ -107,8 +150,25 @@ namespace HospitalNet.UI.Views
             CountTextBlock.Text = $"Total: {_filteredPatients.Count}";
         }
 
+        private void PatientsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PatientsDataGrid.SelectedItem is Patient patient)
+            {
+                SetSelectedPatient(patient);
+                return;
+            }
+
+            SetSelectedPatient(null);
+        }
+
         private void AddPatientButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_patientManager == null)
+            {
+                StatusTextBlock.Text = "Cannot add while offline.";
+                return;
+            }
+
             var addPatientDialog = new AddPatientDialog();
             addPatientDialog.Owner = Window.GetWindow(this);
             bool? result = addPatientDialog.ShowDialog();
@@ -124,6 +184,7 @@ namespace HospitalNet.UI.Views
                     SearchTextBox_TextChanged(SearchTextBox, null);
 
                     StatusTextBlock.Text = "New patient added successfully";
+                    SetSelectedPatient(addPatientDialog.SavedPatient);
                 }
                 else
                 {
@@ -160,7 +221,16 @@ namespace HospitalNet.UI.Views
 
                 if (result == true)
                 {
+                    int editedId = selectedPatient.PatientID;
                     LoadPatients();
+
+                    // Restore selection and details for the edited patient.
+                    var refreshed = _allPatients.FirstOrDefault(p => p.PatientID == editedId);
+                    if (refreshed != null)
+                    {
+                        PatientsDataGrid.SelectedItem = _filteredPatients.FirstOrDefault(p => p.PatientID == editedId) ?? refreshed;
+                        SetSelectedPatient(refreshed);
+                    }
                     // Don't overwrite LoadPatients() status in case it failed.
                 }
             }
