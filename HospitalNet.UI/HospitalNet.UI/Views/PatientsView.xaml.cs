@@ -47,7 +47,7 @@ namespace HospitalNet.UI.Views
                 SelectedPatientEmailText.Text = "-";
                 SelectedPatientDobText.Text = "-";
                 SelectedPatientAgeText.Text = "-";
-                SelectedPatientGenderText.Text = "-";
+                //SelectedPatientGenderText.Text = "-";
                 SelectedPatientLastVisitText.Text = "-";
                 SelectedPatientAllergiesText.Text = "-";
                 SelectedPatientMedicalHistoryText.Text = "-";
@@ -60,7 +60,7 @@ namespace HospitalNet.UI.Views
             SelectedPatientEmailText.Text = string.IsNullOrWhiteSpace(patient.Email) ? "-" : patient.Email;
             SelectedPatientDobText.Text = patient.DateOfBirth == DateTime.MinValue ? "-" : patient.DateOfBirth.ToString("d");
             SelectedPatientAgeText.Text = patient.DateOfBirth == DateTime.MinValue ? "-" : patient.Age.ToString();
-            SelectedPatientGenderText.Text = string.IsNullOrWhiteSpace(patient.Gender) ? "-" : patient.Gender;
+            //SelectedPatientGenderText.Text = string.IsNullOrWhiteSpace(patient.Gender) ? "-" : patient.Gender;
             SelectedPatientLastVisitText.Text = patient.LastVisitDate.HasValue ? patient.LastVisitDate.Value.ToString("g") : "-";
             SelectedPatientAllergiesText.Text = string.IsNullOrWhiteSpace(patient.Allergies) ? "-" : patient.Allergies;
             SelectedPatientMedicalHistoryText.Text = string.IsNullOrWhiteSpace(patient.MedicalHistorySummary) ? "-" : patient.MedicalHistorySummary;
