@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{StaticResource BackgroundBrush}">
-    <Grid Background="{StaticResource BackgroundBrush}">
+             Background="{DynamicResource BackgroundBrush}">
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -15,12 +15,12 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Orientation="Vertical" Margin="20" Background="Transparent">
-            <TextBlock Text="Patient Management" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
-            <TextBlock Text="Manage patient records and information" FontSize="{StaticResource FontSizeNormal}" Foreground="{StaticResource TextSecondaryBrush}"/>
+            <TextBlock Text="Patient Management" FontSize="{StaticResource FontSizeXLarge}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+            <TextBlock Text="Manage patient records and information" FontSize="{StaticResource FontSizeNormal}" Foreground="{DynamicResource TextSecondaryBrush}"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="20,0,20,20" Height="40" VerticalAlignment="Center">
-            <TextBox x:Name="SearchTextBox" Width="300" Height="40" Padding="12,0,12,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Foreground="{StaticResource TextPrimaryBrush}" TextChanged="SearchTextBox_TextChanged" Margin="0,0,10,0"/>
+            <TextBox x:Name="SearchTextBox" Width="300" Height="40" Padding="12,0,12,0" VerticalAlignment="Center" VerticalContentAlignment="Center" Style="{StaticResource StandardTextBoxStyle}" Foreground="{DynamicResource TextPrimaryBrush}" TextChanged="SearchTextBox_TextChanged" Margin="0,0,10,0"/>
             <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="16" VerticalAlignment="Center" Margin="0,0,10,0"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch"/>
             <Button x:Name="AddPatientButton" Width="150" Height="40" VerticalAlignment="Center" Style="{StaticResource PrimaryButtonStyle}" Click="AddPatientButton_Click" Cursor="Hand" Margin="10,0,0,0">
@@ -38,17 +38,17 @@
                 <ColumnDefinition Width="340"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+            <Border Grid.Column="0" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4">
                 <DataGrid x:Name="PatientsDataGrid" Style="{StaticResource StandardDataGridStyle}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="35" ColumnHeaderHeight="40" SelectionChanged="PatientsDataGrid_SelectionChanged">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding PatientID}" Width="60" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="150" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="150" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="180" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="60" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="DOB" Binding="{Binding DateOfBirth, StringFormat=MM/dd/yyyy}" Width="110" Foreground="{StaticResource TextPrimaryBrush}"/>
-                        <DataGridTextColumn Header="Registration Date" Binding="{Binding RegistrationDate, StringFormat=MM/dd/yyyy}" Width="130" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="ID" Binding="{Binding PatientID}" Width="60" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="150" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="150" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="120" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="180" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="60" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="DOB" Binding="{Binding DateOfBirth, StringFormat=MM/dd/yyyy}" Width="110" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <DataGridTextColumn Header="Registration Date" Binding="{Binding RegistrationDate, StringFormat=MM/dd/yyyy}" Width="130" Foreground="{DynamicResource TextPrimaryBrush}"/>
                         <DataGridTemplateColumn Header="Actions" Width="190">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -74,61 +74,61 @@
             </Border>
 
             <!-- Selected Patient Details -->
-            <Border Grid.Column="2" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15">
+            <Border Grid.Column="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15">
                 <StackPanel>
-                    <TextBlock Text="Selected Patient" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock Text="Selected Patient" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,10"/>
 
-                    <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,10">
+                    <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,10">
                         <StackPanel>
-                            <TextBlock x:Name="SelectedPatientNameText" Text="-" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                            <TextBlock x:Name="SelectedPatientMetaText" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                            <TextBlock x:Name="SelectedPatientNameText" Text="-" FontSize="{StaticResource FontSizeMedium}" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" />
+                            <TextBlock x:Name="SelectedPatientMetaText" Text="-" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
 
                     <UniformGrid Columns="2" Rows="4">
-                        <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                        <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
                             <StackPanel>
-                                <TextBlock Text="Phone" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock x:Name="SelectedPatientPhoneText" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Phone" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="SelectedPatientPhoneText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                        <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
                             <StackPanel>
-                                <TextBlock Text="Email" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock x:Name="SelectedPatientEmailText" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Email" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="SelectedPatientEmailText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
+                        <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,10,10">
                             <StackPanel>
-                                <TextBlock Text="Date of Birth" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock x:Name="SelectedPatientDobText" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Date of Birth" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="SelectedPatientDobText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                        <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10">
                             <StackPanel>
-                                <TextBlock Text="Age" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock x:Name="SelectedPatientAgeText" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Age" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="SelectedPatientAgeText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,0">
+                        <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,0">
                             <StackPanel>
-                                <TextBlock Text="Last Visit" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                <TextBlock x:Name="SelectedPatientLastVisitText" Text="-" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Last Visit" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock x:Name="SelectedPatientLastVisitText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}"/>
                             </StackPanel>
                         </Border>
                     </UniformGrid>
 
-                    <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
+                    <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
                         <StackPanel>
-                            <TextBlock Text="Allergies" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock x:Name="SelectedPatientAllergiesText" Text="-" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                            <TextBlock Text="Allergies" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock x:Name="SelectedPatientAllergiesText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
 
-                    <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
+                    <Border Background="{DynamicResource BackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,10,0,0">
                         <StackPanel>
-                            <TextBlock Text="Medical History" FontSize="{StaticResource FontSizeSmall}" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock x:Name="SelectedPatientMedicalHistoryText" Text="-" Foreground="{StaticResource TextPrimaryBrush}" TextWrapping="Wrap" />
+                            <TextBlock Text="Medical History" FontSize="{StaticResource FontSizeSmall}" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock x:Name="SelectedPatientMedicalHistoryText" Text="-" Foreground="{DynamicResource TextPrimaryBrush}" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -136,8 +136,8 @@
         </Grid>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="20" Height="30" VerticalAlignment="Center">
-            <TextBlock x:Name="StatusTextBlock" Text="Loading patients..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
-            <TextBlock x:Name="CountTextBlock" Text="" Foreground="{StaticResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBlock x:Name="StatusTextBlock" Text="Loading patients..." Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
+            <TextBlock x:Name="CountTextBlock" Text="" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center" Margin="20,0,0,0"/>
         </StackPanel>
     </Grid>
 </UserControl>

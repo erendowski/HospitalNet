@@ -301,6 +301,41 @@ namespace HospitalNet.Backend.BusinessLogic
         }
 
         /// <summary>
+        /// Deletes appointments whose date/time has already passed.
+        /// Calls sp_DeleteExpiredAppointments stored procedure.
+        /// </summary>
+        /// <returns>Number of affected rows (updates + deletes).</returns>
+        public int DeleteExpiredAppointments(DateTime now)
+        {
+            try
+            {
+                var parameters = new[]
+                {
+                    DatabaseHelper.CreateInputParameter("@Now", SqlDbType.DateTime2, now)
+                };
+
+                return _dbHelper.ExecuteNonQuery("dbo.sp_DeleteExpiredAppointments", parameters);
+            }
+            catch (SqlException sqlEx)
+            {
+                if (sqlEx.Message != null &&
+                    sqlEx.Message.IndexOf("Could not find stored procedure", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    throw new Exception(
+                        $"Database error while deleting expired appointments: {sqlEx.Message}\n\n" +
+                        "Fix: run the SQL script `Database/12_Add_DeleteExpiredAppointments_Proc.sql` against the same database.",
+                        sqlEx);
+                }
+
+                throw new Exception($"Database error while deleting expired appointments: {sqlEx.Message}", sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting expired appointments: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
         /// Checks if a doctor is available for a specific time slot.
         /// Calls sp_CheckDoctorAvailability stored procedure.
         /// </summary>
@@ -467,9 +502,6 @@ namespace HospitalNet.Backend.BusinessLogic
         /// <summary>
         /// Marks an appointment as completed.
         /// Calls sp_CompleteAppointment stored procedure.
-        /// The appointment is NOT deleted - it remains in the database with Status='Completed'
-        /// so it can be displayed in the Dashboard.
-        /// Also updates the patient's LastVisitDate to the appointment date.
         /// </summary>
         /// <param name="appointmentId">The ID of the appointment to complete.</param>
         /// <returns>True if completion was successful; false otherwise.</returns>
@@ -482,13 +514,6 @@ namespace HospitalNet.Backend.BusinessLogic
                     throw new ArgumentException("Appointment ID must be greater than 0.", nameof(appointmentId));
                 }
 
-                // Get appointment details before completing (to update patient's LastVisitDate)
-                var appointment = GetAppointmentById(appointmentId);
-                if (appointment == null)
-                {
-                    throw new Exception($"Completion failed: appointment not found (ID: {appointmentId}).");
-                }
-
                 var parameters = new[]
                 {
                     DatabaseHelper.CreateInputParameter("@AppointmentId", appointmentId)
@@ -497,19 +522,21 @@ namespace HospitalNet.Backend.BusinessLogic
                 int rowsAffected = _dbHelper.ExecuteNonQuery("sp_CompleteAppointment", parameters);
                 if (rowsAffected > 0)
                 {
-                    // Appointment successfully marked as Completed
-                    // Now update the patient's LastVisitDate
-                    UpdatePatientLastVisitDate(appointment.PatientID, appointment.AppointmentDateTime);
                     return true;
                 }
 
-                if (string.Equals(appointment.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+                var current = GetAppointmentById(appointmentId);
+                if (current == null)
                 {
-                    // Already completed, return success
+                    throw new Exception($"Completion failed: appointment not found (ID: {appointmentId}).");
+                }
+
+                if (string.Equals(current.Status, "Completed", StringComparison.OrdinalIgnoreCase))
+                {
                     return true;
                 }
 
-                throw new Exception($"Completion failed: no rows affected. Current status: '{appointment.Status}'. Verify dbo.sp_CompleteAppointment updates the record and that the login has EXECUTE permission.");
+                throw new Exception($"Completion failed: no rows affected. Current status: '{current.Status}'. Verify dbo.sp_CompleteAppointment updates the record and that the login has EXECUTE permission.");
             }
             catch (SqlException sqlEx)
             {
@@ -518,34 +545,6 @@ namespace HospitalNet.Backend.BusinessLogic
             catch (Exception ex)
             {
                 throw new Exception($"Error completing appointment: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Updates the patient's LastVisitDate when an appointment is completed.
-        /// </summary>
-        /// <param name="patientId">The ID of the patient.</param>
-        /// <param name="visitDate">The date of the completed appointment.</param>
-        private void UpdatePatientLastVisitDate(int patientId, DateTime visitDate)
-        {
-            try
-            {
-                var patientManager = new PatientManager(_connectionString);
-                var patient = patientManager.GetPatientById(patientId);
-                if (patient != null)
-                {
-                    // Only update if this visit is more recent than the current LastVisitDate
-                    if (!patient.LastVisitDate.HasValue || visitDate > patient.LastVisitDate.Value)
-                    {
-                        patient.LastVisitDate = visitDate;
-                        patientManager.UpdatePatient(patient);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log but don't fail the completion - LastVisitDate update is secondary
-                System.Diagnostics.Debug.WriteLine($"Warning: Could not update patient LastVisitDate: {ex.Message}");
             }
         }
 

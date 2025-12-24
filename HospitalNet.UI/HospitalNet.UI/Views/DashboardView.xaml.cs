@@ -42,6 +42,7 @@ namespace HospitalNet.UI.Views
         public DashboardView()
         {
             InitializeComponent();
+            App.AppointmentsChanged += AppointmentsChanged_Handler;
 
             if (App.OfflineMode)
             {
@@ -102,6 +103,16 @@ namespace HospitalNet.UI.Views
 
                 var doctorsById = new System.Collections.Generic.Dictionary<int, Doctor>();
                 var patientsById = new System.Collections.Generic.Dictionary<int, Patient>();
+
+                // Auto-cleanup: remove expired appointments before computing metrics.
+                try
+                {
+                    _appointmentManager.DeleteExpiredAppointments(DateTime.Now);
+                }
+                catch
+                {
+                    // Ignore cleanup failures here; metrics still render from current DB state.
+                }
 
                 // Always compute metrics for today
                 var todayAppointments = _appointmentManager.GetAppointmentsByDate(DateTime.Today);
@@ -247,6 +258,25 @@ namespace HospitalNet.UI.Views
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             _refreshTimer?.Stop();
+            App.AppointmentsChanged -= AppointmentsChanged_Handler;
+        }
+
+        private void AppointmentsChanged_Handler(object sender, EventArgs e)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (!App.OfflineMode)
+                    {
+                        LoadDashboardData();
+                    }
+                });
+            }
+            catch
+            {
+                // Ignore refresh failures.
+            }
         }
 
         private void SetOfflineState(string statusMessage)

@@ -1,11 +1,14 @@
 ﻿using HospitalNet.Backend.Infrastructure;
 using HospitalNet.UI.Dialogs;
+using HospitalNet.Backend.BusinessLogic;
 using HospitalNet.UI.Security;
 using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace HospitalNet.UI
 {
@@ -15,6 +18,10 @@ namespace HospitalNet.UI
     /// </summary>
     public partial class App : Application
     {
+        public static string CurrentTheme { get; private set; } = "Light";
+        private static DispatcherTimer _appointmentCleanupTimer;
+        public static event EventHandler AppointmentsChanged;
+
         private static readonly string[] AdminDbRoleNames =
         {
             "HospitalAdminRole",   // from your SQL script
@@ -102,6 +109,10 @@ namespace HospitalNet.UI
                 OfflineMode = false;
                 IsInitialized = true;
 
+                // Ensure a default theme is applied (the XAML resources start in Light mode).
+                ApplyTheme(CurrentTheme);
+                StartAppointmentCleanupTimer();
+
                 var mainWindow = new MainWindow();
                 MainWindow = mainWindow;
                 mainWindow.Show();
@@ -179,12 +190,80 @@ namespace HospitalNet.UI
             }
         }
 
+        public static void ApplyTheme(string themeName)
+        {
+            if (Application.Current == null)
+                return;
+
+            themeName = string.IsNullOrWhiteSpace(themeName) ? "Light" : themeName.Trim();
+            bool isDark = themeName.Equals("Dark", StringComparison.OrdinalIgnoreCase);
+
+            // Replace resource brushes (some are Frozen/read-only if we try to mutate them).
+            SetBrush("BackgroundBrush", isDark ? "#121212" : "#FAFAFA");
+            SetBrush("SurfaceBrush", isDark ? "#1E1E1E" : "#FFFFFF");
+            SetBrush("SurfaceColor", isDark ? "#1E1E1E" : "#FFFFFF");
+            SetBrush("SurfaceAltBrush", isDark ? "#2A2A2A" : "#F5F5F5");
+            SetBrush("TextPrimaryBrush", isDark ? "#EAEAEA" : "#212121");
+            SetBrush("TextSecondaryBrush", isDark ? "#B0B0B0" : "#757575");
+            SetBrush("BorderBrush", isDark ? "#333333" : "#E0E0E0");
+
+            CurrentTheme = isDark ? "Dark" : "Light";
+        }
+
+        private static void SetBrush(string key, string hex)
+        {
+            if (Application.Current == null)
+                return;
+
+            var color = (Color)ColorConverter.ConvertFromString(hex);
+            Application.Current.Resources[key] = new SolidColorBrush(color);
+        }
+
+        private static void StartAppointmentCleanupTimer()
+        {
+            if (OfflineMode)
+                return;
+
+            _appointmentCleanupTimer?.Stop();
+            _appointmentCleanupTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+            _appointmentCleanupTimer.Tick += (s, e) =>
+            {
+                try
+                {
+                    var manager = new AppointmentManager(ConnectionString);
+                    int affected = manager.DeleteExpiredAppointments(DateTime.Now);
+                    if (affected != 0)
+                    {
+                        RaiseAppointmentsChanged();
+                    }
+                }
+                catch
+                {
+                    // Ignore cleanup failures; user-visible pages handle DB errors explicitly.
+                }
+            };
+            _appointmentCleanupTimer.Start();
+        }
+
+        public static void RaiseAppointmentsChanged()
+        {
+            try
+            {
+                AppointmentsChanged?.Invoke(null, EventArgs.Empty);
+            }
+            catch
+            {
+                // Ignore observer errors.
+            }
+        }
+
         /// <summary>
         /// Handles the application exit event.
         /// Performs cleanup operations before application shutdown.
         /// </summary>
         private void Application_Exit(object sender, ExitEventArgs e)
         {
+            _appointmentCleanupTimer?.Stop();
             System.Diagnostics.Debug.WriteLine("Application shutting down.");
         }
 
